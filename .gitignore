@@ -1,6 +1,3 @@
 /.buildpath
 /.project
 /composer.lock
-/vendor/
-/log/*
-/tmp/*
