@@ -1,0 +1,18 @@
+{
+    "autoload": {
+        "psr-0": {"": "","xsgaphp": "library/","log4php": "library/"},
+        "files": [
+            "app/business/functions/command.php", 
+            "app/business/functions/listing.php",
+            "app/business/functions/dl.php",
+            "app/business/functions/diff.php",
+            "app/business/functions/comp.php",
+            "app/business/functions/log.php"
+        ]
+    },
+    "require": {
+        "geshi/geshi": "1.0.9.1",
+        "pear/archive_tar": "1.4.9",
+        "pear/text_diff": "1.2.2"
+    }
+}
