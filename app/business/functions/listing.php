@@ -59,7 +59,7 @@ function removeURLSeparator($url)
 function urlForPath($fullpath, Setup $setup)
 {
     
-    $isDir = $fullpath{strlen($fullpath) - 1} === '/';
+    $isDir = $fullpath[strlen($fullpath) - 1] === '/';
     
     if ($isDir) {
         
@@ -114,7 +114,7 @@ function showDirFiles(array $subs, $level, $limit, $index, Setup $setup)
     // List each file in the current directory.
     $loop            = 0;
     $last_index      = 0;
-    $accessToThisDir = $setup->rep->hasReadAccess($path, false);
+    $accessToThisDir = $setup->rep->hasReadAccess($path);
     
     // If using flat view and not at the root, create a '..' entry at the top.
     if (!$setup->config->treeView && count($subs) > 2) {
@@ -125,20 +125,21 @@ function showDirFiles(array $subs, $level, $limit, $index, Setup $setup)
         
         $parentPath = implode('/', $parentPath);
         
-        if ($setup->rep->hasReadAccess($parentPath, false)) {
+        if ($setup->rep->hasReadAccess($parentPath)) {
             
-            $setup->listing[$index]['rowparity'] = $index % 2;
-            $setup->listing[$index]['path'] = $parentPath;
-            $setup->listing[$index]['filetype'] = 'dir';
-            $setup->listing[$index]['filename'] = '..';
-            $setup->listing[$index]['fileurl'] = urlForPath($parentPath, $setup);
-            $setup->listing[$index]['filelink'] = '<a href="'.$setup->listing[$index]['fileurl'].'">'.$setup->listing[$index]['filename'].'</a>';
-            $setup->listing[$index]['level'] = 0;
-            $setup->listing[$index]['node'] = 0; // t-node
-            $setup->listing[$index]['revision'] = $setup->rev;
-            $setup->listing[$index]['revurl'] = $setup->config->getURL($setup->rep, $parentPath, 'revision').'rev='.$setup->rev.WebSvnCons::ANDAMP.'isdir=1';
-            $setup->listing[$index]['date'] = $setup->vars['date'];
-            $setup->listing[$index]['age'] = $setup->utils->datetimeFormatDuration($setup->lang, time() - strtotime($setup->vars['date']), true, true);
+            $listvar              = &$setup->listing[$index];
+            $listvar['rowparity'] = $index % 2;
+            $listvar['path']      = $parentPath;
+            $listvar['filetype']  = 'dir';
+            $listvar['filename']  = '..';
+            $listvar['fileurl']   = urlForPath($parentPath, $setup);
+            $listvar['filelink']  = '<a href="'.$listvar['fileurl'].'">'.$listvar['filename'].'</a>';
+            $listvar['level']     = 0;
+            $listvar['node']      = 0;
+            $listvar['revision']  = $setup->rev;
+            $listvar['revurl']    = $setup->config->getURL($setup->rep, $parentPath, 'revision').'rev='.$setup->rev.WebSvnCons::ANDAMP.'isdir=1';
+            $listvar['date']      = $setup->vars['date'];
+            $listvar['age']       = $setup->utils->datetimeFormatDuration($setup->lang, time() - strtotime($setup->vars['date']), true, true);
             
             $index++;
             
@@ -165,54 +166,55 @@ function showDirFiles(array $subs, $level, $limit, $index, Setup $setup)
             $isDirString = ($isDir) ? 'isdir=1'.WebSvnCons::ANDAMP : '';
             
             // Only list files/directories that are not designated as off-limits.
-            $access = ($isDir) ? $setup->rep->hasReadAccess($path.$file, true) : $accessToThisDir;
+            $access = ($isDir) ? $setup->rep->hasReadAccess($path.$file) : $accessToThisDir;
             
             if ($access) {
                 
-                $setup->listing[$index]['rowparity'] = $index % 2;
+                $listvar              = &$setup->listing[$index];
+                $listvar['rowparity'] = $index % 2;
                 
                 if ($isDir) {
-                    $setup->listing[$index]['filetype'] = ($openDir) ? 'diropen' : 'dir';
+                    $listvar['filetype'] = ($openDir) ? 'diropen' : 'dir';
                     $openDir = isset($subs[$level + 1]) && (!strcmp($subs[$level + 1].'/', $file) || !strcmp($subs[$level + 1], $file));
                 } else {
-                    $setup->listing[$index]['filetype'] = strtolower(strrchr($file, '.'));
+                    $listvar['filetype'] = strtolower(strrchr($file, '.'));
                     $openDir = false;
                 }//end if
                 
-                $setup->listing[$index]['isDir'] = $isDir;
-                $setup->listing[$index]['openDir'] = $openDir;
-                $setup->listing[$index]['level'] = ($setup->config->treeView) ? $level : 0;
-                $setup->listing[$index]['node'] = 0; // t-node
-                $setup->listing[$index]['path'] = $path.$file;
-                $setup->listing[$index]['filename'] = $file;
+                $listvar['isDir']    = $isDir;
+                $listvar['openDir']  = $openDir;
+                $listvar['level']    = ($setup->config->treeView) ? $level : 0;
+                $listvar['node']     = 0; // t-node
+                $listvar['path']     = $path.$file;
+                $listvar['filename'] = escape($file);
                 
                 if ($isDir) {
-                    $setup->listing[$index]['fileurl'] = urlForPath($path.$file, $setup);
+                    $listvar['fileurl'] = urlForPath($path.$file, $setup);
                 } else {
                     $setup->passRevString = $setup->utils->createDifferentRevAndPegString($setup->passrev, $setup->peg);
-                    $setup->listing[$index]['fileurl'] = urlForPath($path.$file, $setup);
+                    $listvar['fileurl'] = urlForPath($path.$file, $setup);
                 }//end if
                 
-                $setup->listing[$index]['filelink'] = '<a href="'.$setup->listing[$index]['fileurl'].'">'.$setup->listing[$index]['filename'].'</a>';
+                $listvar['filelink'] = '<a href="'.$listvar['fileurl'].'">'.$listvar['filename'].'</a>';
                 
                 if ($isDir) {
-                    $setup->listing[$index]['logurl'] = $setup->config->getURL($setup->rep, $path.$file, 'log').$isDirString.$setup->passRevString;
+                    $listvar['logurl'] = $setup->config->getURL($setup->rep, $path.$file, 'log').$isDirString.$setup->passRevString;
                 } else {
-                    $setup->listing[$index]['logurl'] = $setup->config->getURL($setup->rep, $path.$file, 'log').$isDirString.$setup->utils->createDifferentRevAndPegString($setup->passrev, $setup->peg);
+                    $listvar['logurl'] = $setup->config->getURL($setup->rep, $path.$file, 'log').$isDirString.$setup->utils->createDifferentRevAndPegString($setup->passrev, $setup->peg);
                 }//end if
                 
                 if ($setup->config->treeView) {
-                    $setup->listing[$index]['compare_box'] = '<input type="checkbox" name="compare[]" value="'.$path.$file.'@'.$setup->passrev.'" onclick="checkCB(this)" />';
+                    $listvar['compare_box'] = '<input type="checkbox" name="compare[]" value="'.escape($path.$file).'@'.$setup->passrev.'" onclick="enforceOnlyTwoChecked(this)" />';
                 }//end if
                 
                 if ($setup->config->showLastModInListing()) {
                     
-                    $setup->listing[$index]['committime'] = $entry->committime;
-                    $setup->listing[$index]['revision'] = $entry->rev;
-                    $setup->listing[$index]['author'] = $entry->author;
-                    $setup->listing[$index]['age'] = $entry->age;
-                    $setup->listing[$index]['date'] = $entry->date;
-                    $setup->listing[$index]['revurl'] = $setup->config->getURL($setup->rep, $path.$file, 'revision').$isDirString.$setup->utils->createRevAndPegString($entry->rev, $setup->peg ? $setup->peg : $setup->rev);
+                    $listvar['committime'] = $entry->committime;
+                    $listvar['revision']   = $entry->rev;
+                    $listvar['author']     = $entry->author;
+                    $listvar['age']        = $entry->age;
+                    $listvar['date']       = $entry->date;
+                    $listvar['revurl']     = $setup->config->getURL($setup->rep, $path.$file, 'revision').$isDirString.$setup->utils->createRevAndPegString($entry->rev, $setup->peg ? $setup->peg : $setup->rev);
                 
                 }//end if
                 
@@ -221,17 +223,17 @@ function showDirFiles(array $subs, $level, $limit, $index, Setup $setup)
                     $downloadurl = $setup->config->getURL($setup->rep, $path.$file, 'dl').$isDirString.$downloadRevAndPeg;
                     
                     if ($isDir) {
-                        $setup->listing[$index]['downloadurl'] = $downloadurl;
-                        $setup->listing[$index]['downloadplainurl'] = '';
+                        $listvar['downloadurl']      = $downloadurl;
+                        $listvar['downloadplainurl'] = '';
                     } else {
-                        $setup->listing[$index]['downloadplainurl'] = $downloadurl;
-                        $setup->listing[$index]['downloadurl'] = '';
+                        $listvar['downloadplainurl'] = $downloadurl;
+                        $listvar['downloadurl'] = '';
                     }//end if
                     
                 } else {
                     
-                    $setup->listing[$index]['downloadplainurl'] = '';
-                    $setup->listing[$index]['downloadurl'] = '';
+                    $listvar['downloadplainurl'] = '';
+                    $listvar['downloadurl']      = '';
                     
                 }//end if
                 

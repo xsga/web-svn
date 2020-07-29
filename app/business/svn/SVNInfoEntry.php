@@ -69,7 +69,7 @@ class SVNInfoEntry extends XsgaAbstractClass
      * 
      * @access public
      */
-    public $isdir = false;
+    public $isdir = null;
     
     
 }//end SVNInfoEntry class.

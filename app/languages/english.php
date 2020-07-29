@@ -84,7 +84,7 @@ $lang["SHOWALL"] = "Show All";
 $lang["BADCMD"] = "Error running this command";
 $lang["UNKNOWNREVISION"] = "Revision not found";
 
-$lang["POWERED"] = "Powered by <a href=\"http://www.websvn.info/\">WebSVN</a>";
+$lang["POWERED"] = "Powered by <a href=\"https://websvnphp.github.io/\">WebSVN</a>";
 $lang["PROJECTS"] = "My SVN Project Repositories";
 $lang["SERVER"] = "Subversion Server";
 
@@ -119,3 +119,13 @@ $lang["COMPPATH"] = "Compare Path:";
 $lang["WITHPATH"] = "With Path:";
 $lang["FILEDELETED"] = "File deleted";
 $lang["FILEADDED"] = "New file";
+
+$lang["ERROR403"] = "Restricted access";
+$lang["ERROR404"] = "Page not found";
+$lang["ERROR500"] = "System error";
+
+$lang["ERROR403DESC"] = "You don't have the necessary permissions to view this content.";
+$lang["ERROR404DESC"] = "The selected page not found.";
+$lang["ERROR500DESC"] = "An internal system error has occurred.";
+$lang["ERRORDESC"]    = "Look at system log for more information or contact to site administrator.";
+

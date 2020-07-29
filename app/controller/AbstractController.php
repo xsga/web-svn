@@ -39,6 +39,9 @@ namespace app\controller;
 use xsgaphp\XsgaAbstractClass;
 use app\business\template\Template;
 use app\business\setup\Setup;
+use xsgaphp\exceptions\XsgaValidationException;
+use app\business\setup\WebSvnCons;
+use app\business\repository\Repository;
 
 /**
  * AbstractController class.
@@ -65,6 +68,123 @@ abstract class AbstractController extends XsgaAbstractClass
         $template->renderTemplate($templateName);
         
     }//end renderTemplate()
+    
+    
+    /**
+     * Validates repository.
+     * 
+     * @param Setup $setup
+     * 
+     * @exception XsgaValidationException
+     * 
+     * @return void
+     * 
+     * @access public
+     */
+    public function validatesRepo(Setup $setup)
+    {
+        
+        if (!$setup->rep) {
+            
+            // Error message.
+            $log = 'No repository selected';
+            
+            // Logger.
+            $this->logger->error($log);
+            
+            throw new XsgaValidationException($log);
+            
+        }//end if
+        
+    }//end validatesRepo()
+    
+    
+    /**
+     * Validates access.
+     * 
+     * @param Setup $setup
+     * 
+     * @exception XsgaValidationException
+     * 
+     * @return void
+     * 
+     * @access public
+     */
+    public function validatesAccess(Setup $setup)
+    {
+        
+        if (!$setup->rep->hasReadAccess($setup->path)) {
+            
+            // Error message.
+            $log = 'No permissions to read this content';
+            
+            // Logger.
+            $this->logger->error($log);
+            
+            throw new XsgaValidationException($log, WebSvnCons::ERROR_403);
+                        
+        }//end if
+        
+    }//end validatesAccess()
+    
+    
+    /**
+     * Validates listing.
+     *
+     * @param Setup        $setup
+     * @param Repository[] $projects
+     *
+     * @exception XsgaValidationException
+     *
+     * @return void
+     *
+     * @access public
+     */
+    public function validatesListing(Setup $setup, array $projects)
+    {
+        
+        if (empty($setup->listing) && !empty($projects)) {
+            
+            // Error message.
+            $log = 'No permissions to read this content';
+            
+            // Logger.
+            $this->logger->error($log);
+            
+            throw new XsgaValidationException($log, WebSvnCons::ERROR_403);
+            
+        }//end if
+        
+    }//end validatesListing()
+    
+    
+    /**
+     * Validates download.
+     *
+     * @param Setup $setup
+     *
+     * @exception XsgaValidationException
+     *
+     * @return void
+     *
+     * @access public
+     */
+    public function ValidatesDownload(Setup $setup)
+    {
+        
+        if (!$setup->rep->isDownloadAllowed($setup->path)) {
+            
+            // Error message.
+            $log = WebSvnCons::DL_ERROR_01.$setup->path;
+            
+            // Logger.
+            $this->logger->error($log);
+            
+            throw new XsgaValidationException($log, WebSvnCons::ERROR_403);
+                        
+        }//end if
+        
+    }//end ValidatesDownload()
     
     
 }//end AbstractController class

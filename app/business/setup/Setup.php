@@ -234,7 +234,7 @@ class Setup extends XsgaAbstractClass
      *
      * @access public
      */
-    public $fileBased= false;
+    public $fileBased = false;
     
     /**
      * Query params.
@@ -244,6 +244,15 @@ class Setup extends XsgaAbstractClass
      * @access public
      */
     public $queryParams;
+    
+    /**
+     * Zipped.
+     * 
+     * @var array
+     * 
+     * @access public
+     */
+    public $zipped;
     
     
     /**
@@ -319,9 +328,9 @@ class Setup extends XsgaAbstractClass
             
         } else {
             
-            $this->vars['repurl'] = $this->config->getURL($this->rep, '', 'dir');
+            $this->vars['repurl']        = $this->config->getURL($this->rep, '', 'dir');
             $this->vars['clientrooturl'] = $this->rep->clientRootURL;
-            $this->vars['repname'] = escape($this->rep->getDisplayName());
+            $this->vars['repname']       = escape($this->rep->getDisplayName());
             $this->vars['allowdownload'] = $this->rep->getAllowDownload($this->config->getAllowDownload());
             
         }//end if
@@ -341,13 +350,14 @@ class Setup extends XsgaAbstractClass
             }//end if
         }//end if
         
-        $this->vars['indexurl'] = $this->config->getURL('', '', 'index');
+        $this->vars['indexurl']      = $this->config->getURL('', '', 'index');
         $this->vars['validationurl'] = $this->utils->getFullURL($_SERVER['SCRIPT_NAME']).'?'.$this->utils->buildQuery($this->queryParams + array('template' => $template, 'language' => $language), '%26');
-        $this->vars['version'] = '1.0.0';
-        $this->vars['currentyear'] = date('Y');
+        $this->vars['version']       = '1.0.0';
+        $this->vars['currentyear']   = date('Y');
         
         // To avoid a possible XSS exploit, need to clean up the passed-in path first.
-        $this->path = !empty($_REQUEST['path']) ? $_REQUEST['path'] : null;
+        $this->path = !empty($_REQUEST['path']) ? escape($_REQUEST['path']) : null;
+        
         if ($this->path === null || $this->path === '') {
             $this->path = '/';
         }//end if
@@ -577,10 +587,10 @@ class Setup extends XsgaAbstractClass
         // Initialize SVN version information by parsing from command-line output.
         $cmd  = $this->config->getSvnCommand();
         $cmd  = str_replace(array('--non-interactive', '--trust-server-cert'), array('', ''), $cmd);
-        $cmd .= ' --version';
+        $cmd .= ' --version -q';
         
         // Execute command.
-        $ret = runCommand($cmd, $this->lang, false);
+        $ret = runCommand($cmd, false);
         
         if (preg_match('~([0-9]+)\.([0-9]+)\.([0-9]+)~', $ret[0], $matches)) {
             
@@ -664,38 +674,25 @@ class Setup extends XsgaAbstractClass
         }//end if
         
         // Set vars.
-        $this->vars['revision_input'] = '<input type="text" size="5" name="rev" placeholder="'.($this->rev ? $this->rev : 'HEAD').'" />';
-        $this->vars['revision_submit'] = '<input type="submit" value="'.$this->lang['GO'].'" />';
+        $this->vars['revision_input']   = '<input type="text" size="5" name="rev" placeholder="'.($this->rev ? $this->rev : 'HEAD').'" />';
+        $this->vars['revision_submit']  = '<input type="submit" value="'.$this->lang['GO'].'" />';
         $this->vars['revision_endform'] = '</form>';
     
     }//end createRevisionSelectionForm()
     
     
     /**
-     * Check sending authenticator header.
-     * 
-     * @param Repository|boolean $rep
+     * Send header forbidden.
      * 
      * @return void
      * 
      * @access public
      */
-    public function checkSendingAuthHeader($rep = false)
+    public function sendHeaderForbidden()
     {
+        http_response_code(403);
         
-        $auth = null;
-        
-        if ($rep) {
-            $auth =& $rep->getAuth();
-        } else {
-            $auth =& $this->config->getAuth();
-        }//end if
-        
-        $loggedin = $auth->hasUsername();
-        
-        header(WebSvnCons::HTTP_403, true, 403);
-        
-    }//end checkSendingAuthHeader()
+    }//end sendHeaderForbidden()
     
     
 }//end Setup class.

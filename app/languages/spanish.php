@@ -38,8 +38,8 @@ $lang["DIFF"] = "Diff";
 
 $lang["NOREP"] = "No se especificó un repositorio";
 $lang["NOPATH"] = "Ruta no encontrada";
-// $lang["NOACCESS"] = "You do not have the necessary permissions to read this content";
-// $lang["RESTRICTED"] = "Restricted access";
+$lang["NOACCESS"] = "No se dispone de los permisos necesarios para acceder al contenido";
+$lang["RESTRICTED"] = "Acceso restringido";
 $lang["SUPPLYREP"] = "Por favor, configure una ruta a un repositorio en include/config.php usando \$config->parentPath o \$config->addRepository<p>Verifique la guía de instalación para mas detalles";
 
 $lang["DIFFREVS"] = "Diff entre versiones";
@@ -84,7 +84,7 @@ $lang["SHOWALL"] = "Mostrar todo";
 $lang["BADCMD"] = "Error ejecutando ese comando";
 $lang["UNKNOWNREVISION"] = "Revisión no encontrada";
 
-$lang["POWERED"] = "Powered by <a href=\"http://www.websvn.info/\">WebSVN</a>";
+$lang["POWERED"] = "Powered by <a href=\"https://websvnphp.github.io/\">WebSVN</a>";
 $lang["PROJECTS"] = "Mis Proyectos";
 $lang["SERVER"] = "Servidor de Subversion";
 
@@ -119,3 +119,12 @@ $lang["COMPPATH"] = "Comparar Ruta:";
 $lang["WITHPATH"] = "Con Ruta:";
 $lang["FILEDELETED"] = "Archivo Eliminado";
 $lang["FILEADDED"] = "Archivo Nuevo";
+
+$lang["ERROR403"] = "Acceso no autorizado";
+$lang["ERROR404"] = "Página no encontrada";
+$lang["ERROR500"] = "Error del sistema";
+
+$lang["ERROR403DESC"] = "No se dispone de los permisos necesarios para acceder al contenido seleccionado.";
+$lang["ERROR404DESC"] = "No se puede acceder a la página solicitada ya que no se ha encontrado el contenido a mostrar.";
+$lang["ERROR500DESC"] = "Se ha producido un error interno del sistema.";
+$lang["ERRORDESC"]    = "Revise los registros de log del sistema para obtener más información o contacte con el administrador del sitio.";

@@ -40,6 +40,7 @@ use app\business\repository\Repository;
 use app\business\setup\Setup;
 use app\business\setup\WebSvnCons;
 use xsgaphp\XsgaAbstractClass;
+use xsgaphp\exceptions\XsgaException;
 
 /**
  * Utils class
@@ -247,20 +248,20 @@ class Utils extends XsgaAbstractClass
             $host = $_SERVER['SERVER_ADDR'].$port;
         } else {
             
+            // Error message.
             $errorMsg = 'Unable to redirect';
             
             // Logger.
             $this->logger->error($errorMsg);
             
-            echo $errorMsg;
-            exit;
+            throw new XsgaException($errorMsg);
             
         }//end if
         
         // Make sure we have a directory to go to.
         if (empty($loc)) {
             $loc = '/';
-        } else if ($loc{0} !== '/') {
+        } else if ($loc[0] !== '/') {
             $loc = '/'.$loc;
         }//end if
         
@@ -357,7 +358,7 @@ class Utils extends XsgaAbstractClass
                 continue;
             }//end if
             
-            switch ($chunks[$i]{0}) {
+            switch ($chunks[$i][0]) {
                 case '<':
                     // HTML tag: ignore its width by doing nothing.
                     break;
@@ -440,11 +441,8 @@ class Utils extends XsgaAbstractClass
                     $text .= $nbsp ? '&nbsp;' : ' ';
                 }//end if
                 
-                if ($any && $qty[$i] < 10) {
-                    $text .= '0';
-                }//end if
+                $text .= $qty[$i].' '.$names[$i];
                 
-                $text .= $qty[$i].$names[$i];
                 $any = true;
                 $parts++;
                 

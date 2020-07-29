@@ -146,7 +146,7 @@ class SVNLook extends XsgaAbstractClass
                 
                 if (count($attrs)) {
                     
-                    while (list($k, $v) = each($attrs)) {
+                    foreach ($attrs as $k => $v) {
                         
                         if ($k === 'KIND') {
                             $this->curInfo->isdir = ($v == 'dir');
@@ -154,7 +154,7 @@ class SVNLook extends XsgaAbstractClass
                             $this->curInfo->rev = $v;
                         }//end if
                         
-                    }//end while
+                    }//end foreach
                     
                 }//end if
                 
@@ -236,11 +236,11 @@ class SVNLook extends XsgaAbstractClass
             case 'LIST':
                                 
                 if (count($attrs)) {
-                    while (list($k, $v) = each($attrs)) {
+                    foreach ($attrs as $k => $v) {
                         if ($k === 'PATH') {
                             $this->curList->path = $v;
                         }//end if
-                    }//end while
+                    }//end foreach
                 }//end if
                 
                 break;
@@ -250,11 +250,11 @@ class SVNLook extends XsgaAbstractClass
                 $this->curList->curEntry = new SVNListEntry;
                 
                 if (count($attrs)) {
-                    while (list($k, $v) = each($attrs)) {
+                    foreach ($attrs as $k => $v) {
                         if ($k === 'KIND') {
                             $this->curList->curEntry->isdir = ($v === 'dir');
                         }//end if
-                    }//end while
+                    }//end foreach
                 }//end if
                 
                 break;
@@ -262,11 +262,11 @@ class SVNLook extends XsgaAbstractClass
             case 'COMMIT':
                                 
                 if (count($attrs)) {
-                    while (list($k, $v) = each($attrs)) {
+                    foreach ($attrs as $k => $v) {
                         if ($k === 'REVISION') {
                             $this->curList->curEntry->rev = $v;
                         }//end if
-                    }//end while
+                    }//end foreach
                 }//end if
                 break;
                 
@@ -332,6 +332,9 @@ class SVNLook extends XsgaAbstractClass
                 
                 break;
                 
+            default:
+                break;
+                
         }//end switch
         
     }//end listCharacterData()
@@ -389,11 +392,11 @@ class SVNLook extends XsgaAbstractClass
                 $this->curLog->curEntry->path = $this->curLog->path;
                 
                 if (count($attrs)) {
-                    while (list($k, $v) = each($attrs)) {
+                    foreach ($attrs as $k => $v) {
                         if ($k === 'REVISION') {
                             $this->curLog->curEntry->rev = $v;
                         }//end if
-                    }//end while
+                    }//end foreach
                 }//end if
                 
                 break;
@@ -404,7 +407,7 @@ class SVNLook extends XsgaAbstractClass
                 
                 if (count($attrs)) {
                     
-                    while (list($k, $v) = each($attrs)) {
+                    foreach ($attrs as $k => $v) {
                         
                         switch ($k) {
                             case 'ACTION':
@@ -423,9 +426,12 @@ class SVNLook extends XsgaAbstractClass
                                 $this->curLog->curEntry->curMod->isdir = ($v == 'dir');
                                 break;
                                 
+                            default:
+                                break;
+                                
                         }//end switch
                         
-                    }//end while
+                    }//end foreach
                     
                 }//end if
                 
@@ -456,12 +462,46 @@ class SVNLook extends XsgaAbstractClass
                 break;
                 
             case 'PATH':
+                
+                // The XML returned when a file is renamed/branched in inconsistent.
+                // In the case of a branch, the path doesn't include the leafname.
+                // In the case of a rename, it does.    Ludicrous.
+                
+                if (!empty($this->curLog->path)) {
+                    $pos      = strrpos($this->curLog->path, '/');
+                    $curpath  = substr($this->curLog->path, 0, $pos);
+                    $leafname = substr($this->curLog->path, $pos + 1);
+                } else {
+                    $curpath  = '';
+                    $leafname = '';
+                }//end if
+                
+                $curMod = $this->curLog->curEntry->curMod;
+                
+                if ($curMod->action === 'A') {
+                    
+                    if ($curMod->path === $this->curLog->path) {
+                        // For directories and renames.
+                        $this->curLog->path = $curMod->copyfrom;
+                    } else if ($curMod->path === $curpath || $curMod->path === $curpath.'/') {
+                        // Logs of files that have moved due to branching.
+                        $this->curLog->path = $curMod->copyfrom.'/'.$leafname;
+                    } else {
+                        $this->curLog->path = str_replace($curMod->path, $curMod->copyfrom, $this->curLog->path);
+                    }//end if
+                }//end if
+                
                 $this->curLog->curEntry->mods[] = $this->curLog->curEntry->curMod;
+                
                 break;
                 
             case 'MSG':
                 $this->curLog->curEntry->msg = trim($this->curLog->curEntry->msg);
                 break;
+                
+            default:
+                break;
+                
         }//end switch
         
         $this->curTag = '';
@@ -530,44 +570,9 @@ class SVNLook extends XsgaAbstractClass
                 
                 $this->curLog->curEntry->curMod->path .= $data;
                 
-                // The XML returned when a file is renamed/branched in inconsistent.
-                // In the case of a branch, the path doesn't include the leafname.
-                // In the case of a rename, it does.    Ludicrous.
-                if (!empty($this->curLog->path)) {
-                    
-                    $pos           = strrpos($this->curLog->path, '/');
-                    $this->curpath = substr($this->curLog->path, 0, $pos);
-                    $leafname      = substr($this->curLog->path, $pos + 1);
-                    
-                } else {
-                    
-                    $this->curpath = '';
-                    $leafname      = '';
-                    
-                }//end if
+                break;
                 
-                $this->curMod = $this->curLog->curEntry->curMod;
-                
-                if ($this->curMod->action === 'A') {
-                    
-                    if ($data === $this->curLog->path) {
-                        
-                        // For directories and renames
-                        $this->curLog->path = $this->curMod->copyfrom;
-                    
-                    } else if ($data === $this->curpath || $data === $this->curpath.'/') {
-                        
-                        // Logs of files that have moved due to branching
-                        $this->curLog->path = $this->curMod->copyfrom.'/'.$leafname;
-                        
-                    } else {
-                        
-                        $this->curLog->path = str_replace($this->curMod->path, $this->curMod->copyfrom, $this->curLog->path);
-                        
-                    }//end if
-                    
-                }//end if
-                
+            default:
                 break;
                 
         }//end switch
@@ -587,7 +592,7 @@ class SVNLook extends XsgaAbstractClass
     public function _topLevel($entry)
     {
         // To be at top level, there must be one space before the entry
-        return (strlen($entry) > 1 && $entry{0} === ' ' && $entry{1} !== ' ');
+        return (strlen($entry) > 1 && $entry[0] === ' ' && $entry[1] !== ' ');
         
     }//end _topLevel()
     
@@ -609,8 +614,8 @@ class SVNLook extends XsgaAbstractClass
         $file1 = $e1->file;
         $file2 = $e2->file;
         
-        $isDir1 = ($file1{strlen($file1) - 1} == '/');
-        $isDir2 = ($file2{strlen($file2) - 1} == '/');
+        $isDir1 = ($file1[strlen($file1) - 1] === '/');
+        $isDir2 = ($file2[strlen($file2) - 1] === '/');
         
         if (!$this->setup->config->isAlphabeticOrder()) {
             
@@ -657,7 +662,7 @@ class SVNLook extends XsgaAbstractClass
         
         for ($i = 0; $i < $partscount; $i++) {
             // Do not urlencode the 'svn+ssh://' part.
-            if ($i != 0 || $parts[$i] !== 'svn+ssh:') {
+            if ($i !== 0 || $parts[$i] !== 'svn+ssh:') {
                 $parts[$i] = rawurlencode($parts[$i]);
             }//end if
         }//end for

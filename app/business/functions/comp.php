@@ -157,12 +157,13 @@ function clearVars($ignoreWhitespace, Setup $setup, &$index)
         
     }//end if
     
-    $setup->listing[$index]['newpath']      = null;
-    $setup->listing[$index]['endpath']      = null;
-    $setup->listing[$index]['info']         = null;
-    $setup->listing[$index]['diffclass']    = null;
-    $setup->listing[$index]['difflines']    = null;
-    $setup->listing[$index]['enddifflines'] = null;
-    $setup->listing[$index]['properties']   = null;
+    $listvar                 = &$setup->listing[$index];
+    $listvar['newpath']      = null;
+    $listvar['endpath']      = null;
+    $listvar['info']         = null;
+    $listvar['diffclass']    = null;
+    $listvar['difflines']    = null;
+    $listvar['enddifflines'] = null;
+    $listvar['properties']   = null;
     
 }//end clearVars()

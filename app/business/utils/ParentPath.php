@@ -143,38 +143,30 @@ class ParentPath extends XsgaAbstractClass
             
         }//end if
         
-        if ($handle = @opendir($this->path)) {
+        // Is there a directory named $name?
+        $fullpath = $this->path.DIRECTORY_SEPARATOR.$name;
+        
+        if (is_dir($fullpath) && is_readable($fullpath)) {
             
-            // Is there a directory named $name?.
-            $fullpath = $this->path.DIRECTORY_SEPARATOR.$name;
+            // And that contains a db directory (in an attempt to not include non svn repositories.
+            $dbfullpath = $fullpath.DIRECTORY_SEPARATOR.'db';
             
-            if (is_dir($fullpath) && is_readable($fullpath)) {
+            if ((is_dir($dbfullpath) && is_readable($dbfullpath)) && ($this->pattern === false || preg_match($this->pattern, $name))) {
                 
-                // And that contains a db directory (in an attempt to not include non svn repositories.
-                $dbfullpath = $fullpath.DIRECTORY_SEPARATOR.'db';
+                $url = $this->config->fileUrlPrefix.$fullpath;
+                $url = str_replace(DIRECTORY_SEPARATOR, '/', $url);
                 
-                // And matches the pattern if specified
-                if (is_dir($dbfullpath) && is_readable($dbfullpath) && 
-                   ($this->pattern === false || preg_match($this->pattern, $name))) {
-                    
-                   $url = 'file:///'.$fullpath;
-                   $url = str_replace(DIRECTORY_SEPARATOR, '/', $url);
-                   
-                   if ($url{strlen($url) - 1} === '/') {
-                       $url = substr($url, 0, -1);
-                   }//end if
-                   
-                   if (!in_array($url, $this->config->_excluded, true)) {
-                       $clientRoot = ($this->clientRootURL) ? $this->clientRootURL.'/'.$name : '';
-                       $rep = new Repository($this->config, $name, $name, $url, $this->group, null, null, null, $clientRoot);
-                       return $rep;
-                   }//end if
-                    
+                if ($url[strlen($url) - 1] === '/') {
+                    $url = substr($url, 0, -1);
+                }//end if
+                
+                if (!in_array($url, $this->config->_excluded, true)) {
+                    $clientRootURL = ($this->clientRootURL) ? $this->clientRootURL.'/'.$name : '';
+                    $rep = new Repository($this->config, $name, $name, $url, $this->group, null, null, null, $clientRootURL);
+                    return $rep;
                 }//end if
                 
             }//end if
-            
-            closedir($handle);
             
         }//end if
         
@@ -204,7 +196,7 @@ class ParentPath extends XsgaAbstractClass
             
             $fullpath = $this->path.DIRECTORY_SEPARATOR.$name;
             
-            if ($name{0} !== '.' && is_dir($fullpath) && is_readable($fullpath)) {
+            if ($name[0] !== '.' && is_dir($fullpath) && is_readable($fullpath)) {
                 
                 $dbfullpath = $fullpath.DIRECTORY_SEPARATOR.'db';
                 
@@ -212,10 +204,10 @@ class ParentPath extends XsgaAbstractClass
                 // And matches the pattern if specified.
                 if (is_dir($dbfullpath) && is_readable($dbfullpath) && ($this->pattern === false || preg_match($this->pattern, $name))){
                     
-                    $url = 'file:///'.$fullpath;
+                    $url = $this->config->fileUrlPrefix.$fullpath;
                     $url = str_replace(DIRECTORY_SEPARATOR, '/', $url);
                     
-                    if ($url{strlen($url) - 1} === '/') {
+                    if ($url[strlen($url) - 1] === '/') {
                         $url = substr($url, 0, -1);
                     }//end if
                     

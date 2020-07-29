@@ -33,6 +33,7 @@
  */
 use app\business\setup\WebSvnCons;
 use log4php\Logger;
+use xsgaphp\exceptions\XsgaException;
 
 /**
  * Detect character encoding.
@@ -43,7 +44,7 @@ use log4php\Logger;
  */
 function detectCharacterEncoding($str)
 {
-    return mb_detect_encoding($str.'a', array('UTF-8', 'ISO-8859-1'));
+    return mb_detect_encoding($str.'a', array('UTF-8', 'Windows-1252', 'ISO-8859-1'));
     
 }//end detectCharacterEncoding()
 
@@ -112,25 +113,6 @@ function escape($str)
 
 
 /**
- * Quote command.
- * 
- * @param string $cmd Command.
- * 
- * @return string
- */
-function quoteCommand($cmd)
-{
-    // On Windows machines, the whole line needs quotes round it so that it's passed to cmd.exe correctly.
-    if (SERVER_IS_WINDOWS) {
-        $cmd = '"'.$cmd.'"';
-    }//end if
-    
-    return $cmd;
-    
-}//end quoteCommand()
-
-
-/**
  * Execute command.
  * 
  * @param string  $cmd
@@ -177,34 +159,42 @@ function passthruCommand($cmd)
 /**
  * Run command.
  * 
- * @param string $cmd
- * @param array  $lang
- * @param string $mayReturnNothing
+ * @param string  $cmd
+ * @param boolean $mayReturnNothing
+ * @param string  $errorIf
  * 
  * @return string[]
  */
-function runCommand($cmd, array $lang, $mayReturnNothing = false)
+function runCommand($cmd, $mayReturnNothing = false, &$errorIf = 'NOT_USED')
 {
     
     // Get logger.
     $logger = Logger::getRootLogger();
     
     $output = array();
-    $err    = false;
-
-    $c = quoteCommand($cmd);
-
+    $error  = '';
+    $opts   = null;
+    
+    if (SERVER_IS_WINDOWS) {
+        if (!strpos($cmd, '>') && !strpos($cmd, '|')) {
+            $opts = array('bypass_shell' => true);
+        } else {
+            $cmd = '"'.$cmd.'"';
+        }//end if
+    }//end if
+    
     $descriptorspec = array(0 => array('pipe', 'r'), 1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
-
-    $resource = proc_open($c, $descriptorspec, $pipes);
-    $error    = '';
-
+    $resource       = proc_open($cmd, $descriptorspec, $pipes, null, null, $opts);
+    
     if (!is_resource($resource)) {
 
+        // Error message.
+        $errorMsg = 'Error running command: '.stripCredentialsFromCommand($cmd);
+        
         // Logger.
-        $logger->error('Error running command: '.stripCredentialsFromCommand($cmd));
-        echo '<p>'.$lang['BADCMD'].': <code>'.stripCredentialsFromCommand($cmd).'</code></p>';
-        exit;
+        $logger->error($errorMsg);
+        
+        throw new XsgaException($errorMsg);
         
     }//end if
 
@@ -216,7 +206,8 @@ function runCommand($cmd, array $lang, $mayReturnNothing = false)
         $line = fgets($handle);
         
         if ($firstline && empty($line) && !$mayReturnNothing) {
-            $err = true;
+            $error = 'No output on STDOUT';
+            break;
         }//end if
 
         $firstline = false;
@@ -236,12 +227,25 @@ function runCommand($cmd, array $lang, $mayReturnNothing = false)
 
     proc_close($resource);
 
-    if (!$err) {
+    # Some commands are expected to return no output, but warnings on STDERR.
+    if (!empty($output) || $mayReturnNothing) {
         return $output;
-    } else {
-        echo '<p>'.$lang['BADCMD'].': <code>'.stripCredentialsFromCommand($cmd).'</code></p><p>'.nl2br($error).'</p>';
     }//end if
     
+    if ($errorIf !== 'NOT_USED') {
+        $errorIf = $error;
+        return $output;
+    }//end if
+    
+    // Error message.
+    $errorMsg = 'Error executing this command: '.stripCredentialsFromCommand($cmd);
+    
+    // Logger.
+    $logger->error($errorMsg);
+    $logger->error(nl2br($error));
+    
+    throw new XsgaException($errorMsg);
+        
 }//end runCommand()
 
 

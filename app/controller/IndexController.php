@@ -57,95 +57,119 @@ class IndexController extends AbstractController
     public function __construct(Setup $setup)
     {
         
+        // Executes parent constructor.
         parent::__construct();
         
-        $setup->vars['action'] = $setup->lang['PROJECTS'];
-        $setup->vars['repname'] = '';
-        $setup->vars['rev'] = 0;
-        $setup->vars['path'] = '';
+        // Set vars.
+        $setup->vars['action']      = $setup->lang['PROJECTS'];
+        $setup->vars['repname']     = '';
+        $setup->vars['rev']         = 0;
+        $setup->vars['path']        = '';
         $setup->vars['showlastmod'] = $setup->config->showLastModInIndex();
         
         // Sort the repositories by group.
         $setup->config->sortByGroup();
+        
+        // Get projects.
         $projects = $setup->config->getRepositories();
         
-        if (count($projects) === 1 && $projects[0]->hasReadAccess('/', true)) {
+        if (count($projects) === 1 && $projects[0]->hasReadAccess('/')) {
             header('Location: '.str_replace(WebSvnCons::ANDAMP, '', $setup->config->getURL($projects[0], '', 'dir')));
             exit;
         }//end if
         
-        $i = 0;
-        
         // Alternates between every entry, whether it is a group or project.
+        $i      = 0;
         $parity = 0;
         
         // The first project (and first of any group) resets this to 0.
         $groupparity = 0;
-        $curgroup = null;
-        $groupcount = 0;
+        $curgroup    = null;
+        $groupcount  = 0;
         
         // Create listing of all configured projects (includes groups if they are used).
         foreach ($projects as $project) {
             
-            if (!$project->hasReadAccess('/', true)) {
+            if (!$project->hasReadAccess('/')) {
                 continue;
             }//end if
             
+            $listvar = &$setup->listing[$i];
+            
             // If this is the first project in a group, add an entry for the group.
-            if ($curgroup != $project->group) {
+            if ($curgroup !== $project->group) {
+                
                 $groupcount++;
                 $groupparity = 0;
-                $setup->listing[$i]['notfirstgroup'] = !empty($curgroup);
+                $listvar['notfirstgroup'] = !empty($curgroup);
+                
                 $curgroup = $project->group;
-                $setup->listing[$i]['groupname'] = $curgroup;
-                $setup->listing[$i]['groupid'] = strtr(base64_encode('grp'.$curgroup), array('+' => '-', '/' => '_', '=' => ''));
-                $setup->listing[$i]['projectlink'] = null;
+                $listvar['groupname']   = $curgroup;
+                $listvar['groupid']     = strtr(base64_encode('grp'.$curgroup), array('+' => '-', '/' => '_', '=' => ''));
+                
+                // Setting to null because template.php won't unset them.
+                $listvar['projectlink'] = null;
+                $listvar['projectname'] = null;
+                $listvar['projecturl']  = null;
+                
                 $i++;
-                $setup->listing[$i]['groupid'] = null;
+                $listvar = &$setup->listing[$i];
+                $listvar['groupid'] = null;
+                
             }//end if
             
-            $setup->listing[$i]['clientrooturl'] = $project->clientRootURL;
+            $listvar['clientrooturl'] = $project->clientRootURL;
             
             // Populate variables for latest modification to the current repository.
             if ($setup->config->showLastModInIndex()) {
+                
                 $setup->svnrep = new SVNRepository($setup);
-                $log = $setup->svnrep->getLog('/', '', '', true, 1);
+                $log           = $setup->svnrep->getLog('/', '', '', true, 1);
+                
                 if (isset($log->entries[0])) {
+                    
                     $head = $log->entries[0];
-                    $setup->listing[$i]['revision'] = $head->rev;
-                    $setup->listing[$i]['date'] = $head->date;
-                    $setup->listing[$i]['age'] = $setup->utils->datetimeFormatDuration($setup->lang, time() - strtotime($head->date));
-                    $setup->listing[$i]['author'] = $head->author;
+                    
+                    $listvar['revision'] = $head->rev;
+                    $listvar['date']     = $head->date;
+                    $listvar['age']      = $setup->utils->datetimeFormatDuration($setup->lang, time() - strtotime($head->date));
+                    $listvar['author']   = $head->author;
+                    
                 } else {
-                    $setup->listing[$i]['revision'] = 0;
-                    $setup->listing[$i]['date'] = '';
-                    $setup->listing[$i]['age'] = '';
-                    $setup->listing[$i]['author'] = '';
+                    
+                    $listvar['revision'] = 0;
+                    $listvar['date']     = '';
+                    $listvar['age']      = '';
+                    $listvar['author']   = '';
+                    
                 }//end if
+                
             }//end if
             
             // Create project (repository) listing.
-            $url = str_replace(WebSvnCons::ANDAMP, '', $setup->config->getURL($project, '', 'dir'));
+            $url  = str_replace(WebSvnCons::ANDAMP, '', $setup->config->getURL($project, '', 'dir'));
             $name = ($setup->config->flatIndex) ? $project->getDisplayName() : $project->name;
-            $setup->listing[$i]['projectlink'] = '<a href="'.$url.'">'.escape($name).'</a>';
-            $setup->listing[$i]['rowparity'] = $parity % 2;
+            
+            $listvar['projectlink'] = '<a href="'.$url.'">'.escape($name).'</a>';
+            $listvar['projectname'] = escape($name);
+            $listvar['projecturl']  = $url;
+            $listvar['rowparity']   = $parity % 2;
+            $listvar['groupparity'] = $groupparity % 2;
+            $listvar['groupname']   = ($curgroup != null) ? $curgroup : '';
+            
+            // Increase counters.
             $parity++;
-            $setup->listing[$i]['groupparity'] = $groupparity % 2;
             $groupparity++;
-            $setup->listing[$i]['groupname'] = ($curgroup != null) ? $curgroup : '';
             $i++;
             
         }//end foreach
         
-        if (empty($setup->listing) && !empty($projects)) {
-            $setup->vars['error'] = $setup->lang['NOACCESS'];
-            $setup->checkSendingAuthHeader();
-        }//end if
+        $this->validatesListing($setup, $projects);
         
-        $setup->vars['flatview'] = $setup->config->flatIndex;
-        $setup->vars['treeview'] = !$setup->config->flatIndex;
-        $setup->vars['opentree'] = $setup->config->openTree;
-        $setup->vars['groupcount'] = $groupcount; // Indicates whether any groups were present.
+        $setup->vars['flatview']   = $setup->config->flatIndex;
+        $setup->vars['treeview']   = !$setup->config->flatIndex;
+        $setup->vars['opentree']   = $setup->config->openTree;
+        $setup->vars['groupcount'] = $groupcount;
         
         // Render template.
         $this->renderTemplate($setup, 'index');

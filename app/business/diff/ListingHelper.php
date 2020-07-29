@@ -89,16 +89,15 @@ class ListingHelper extends XsgaAbstractClass
     public function _add($text1, $lineno1, $class1, $text2, $lineno2, $class2)
     {
         
-        $this->_listing[$this->_index]['rev1diffclass'] = $class1;
-        $this->_listing[$this->_index]['rev2diffclass'] = $class2;
+        $listvar = &$this->_listing[$this->_index];
         
-        $this->_listing[$this->_index]['rev1line'] = $text1;
-        $this->_listing[$this->_index]['rev2line'] = $text2;
-        
-        $this->_listing[$this->_index]['rev1lineno'] = $lineno1;
-        $this->_listing[$this->_index]['rev2lineno'] = $lineno2;
-        
-        $this->_listing[$this->_index]['startblock'] = $this->_blockStart;
+        $listvar['rev1diffclass'] = $class1;
+        $listvar['rev2diffclass'] = $class2;
+        $listvar['rev1line']      = $text1;
+        $listvar['rev2line']      = $text2;
+        $listvar['rev1lineno']    = $lineno1;
+        $listvar['rev2lineno']    = $lineno2;
+        $listvar['startblock']    = $this->_blockStart;
         
         $this->_blockStart = false;
         

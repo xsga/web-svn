@@ -1,12 +1,4 @@
-     <div id="info">
-     <h2>About</h2>
-     <dl>
-       <dd>My SVN repositories.</dd>
-       <dd>SVN Repository server <a href="https://svn.xsga.es/repositories" target="blank_">here</a></dd>
-       <dd>By xsga</dd>
-     </dl>
-     </div>
-     
+[websvn-include:user_greeting.tmpl]
 [websvn-test:error]
   <div id="error">[websvn:error]</div>
 [websvn-else]
@@ -18,7 +10,7 @@
     [websvn-test:groupid]
     [websvn-else]
       <tr>
-        <td class="project">[websvn:projectlink]</td>
+        <td class="project"><a href="[websvn:projecturl]">[websvn:projectname]</a></td>
         [websvn-test:showlastmod]
         <td>[lang:REV] [websvn:revision]</td>
         [websvn-test:showageinsteadofdate]
@@ -47,9 +39,9 @@
     [websvn-else]
       <tr title="[websvn:groupname]">
       [websvn-test:groupname]
-        <td class="project group">[websvn:projectlink]</td>
+        <td class="project group"><a href="[websvn:projecturl]">[websvn:projectname]</a></td>
       [websvn-else]
-        <td class="project">[websvn:projectlink]</td>
+        <td class="project"><a href="[websvn:projecturl]">[websvn:projectname]</a></td>
       [websvn-endtest]
       [websvn-test:showlastmod]
         <td>[lang:REV] [websvn:revision]</td>

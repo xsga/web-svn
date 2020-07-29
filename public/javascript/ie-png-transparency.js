@@ -17,7 +17,7 @@ function correctPNG()
          {
             var imgAttrib = imgAttribs[j];
             if (imgAttrib.nodeName == "align")
-            {          
+            {		  
                if (imgAttrib.nodeValue == "left") imgStyle = "float:left;" + imgStyle
                if (imgAttrib.nodeValue == "right") imgStyle = "float:right;" + imgStyle
                break

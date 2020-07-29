@@ -37,9 +37,11 @@ namespace app\business\setup;
  * Used classes.
  */
 use app\business\utils\ParentPath;
-use app\business\utils\Authentication;
 use app\business\repository\Repository;
 use xsgaphp\XsgaAbstractClass;
+use xsgaphp\exceptions\XsgaFileNotFoundException;
+use xsgaphp\exceptions\XsgaException;
+use app\business\utils\Authorization;
 
 /**
  * WebSvnConfig class.
@@ -91,6 +93,15 @@ class WebSvnConfig extends XsgaAbstractClass
      * @access public
      */
     public $svn = '';
+    
+    /**
+     * SVN Authz.
+     * 
+     * @var string
+     * 
+     * @access public
+     */
+    public $svnAuthz = 'svnauthz accessof';
     
     /**
      * Diff command.
@@ -156,13 +167,13 @@ class WebSvnConfig extends XsgaAbstractClass
     public $defaultFileDlMode = 'plain';
     
     /**
-     * Default folder download mode.
+     * Default directory download mode.
      * 
      * @var string
      * 
      * @access public
      */
-    public $defaultFolderDlMode = 'gzip';
+    public $defaultDirectoryDlMode = 'gzip';
     
     /**
      * Valid file download models.
@@ -174,13 +185,13 @@ class WebSvnConfig extends XsgaAbstractClass
     public $validFileDlModes = array( 'gzip', 'zip', 'plain' );
     
     /**
-     * Valid folder download modes.
+     * Valid directory download modes.
      * 
      * @var array
      * 
      * @access public
      */
-    public $validFolderDlModes = array( 'gzip', 'zip' );
+    public $validDirectoryDlModes = array( 'gzip', 'zip' );
 
     /**
      * Treeview.
@@ -381,13 +392,13 @@ class WebSvnConfig extends XsgaAbstractClass
     public $bugtraqProperties;
     
     /**
-     * Authentication.
+     * Authorization.
      * 
-     * @var Authentication
+     * @var Authorization
      * 
      * @access public
      */
-    public $auth = null;
+    public $authz = null;
     
     /**
      * Block robots.
@@ -496,6 +507,15 @@ class WebSvnConfig extends XsgaAbstractClass
      * @access public
      */
     public $pathSeparator = ':';
+    
+    /**
+     * File URL prefix.
+     * 
+     * @var string
+     * 
+     * @access public
+     */
+    public $fileUrlPrefix = 'file:///';
 
     /**
      * Repositories.
@@ -644,7 +664,7 @@ class WebSvnConfig extends XsgaAbstractClass
         $url = 'file:///'.$path;
         $url = str_replace(DIRECTORY_SEPARATOR, '/', $url);
         
-        if ($url{strlen($url) - 1} === '/') {
+        if ($url[strlen($url) - 1] === '/') {
             $url = substr($url, 0, -1);
         }//end if
         
@@ -1035,7 +1055,7 @@ class WebSvnConfig extends XsgaAbstractClass
      */
     public function addAllowedDownloadException($path, $myrep = 0)
     {
-        if ($path{strlen($path) - 1} !== '/') {
+        if ($path[strlen($path) - 1] !== '/') {
             $path .= '/';
         }//end if
 
@@ -1061,7 +1081,7 @@ class WebSvnConfig extends XsgaAbstractClass
      */
     public function addDisallowedDownloadException($path, $myrep = 0)
     {
-        if ($path{strlen($path) - 1} !== '/') {
+        if ($path[trlen($path) - 1] !== '/') {
             $path .= '/';
         }//end if
 
@@ -1230,13 +1250,13 @@ class WebSvnConfig extends XsgaAbstractClass
 
             if (($this->serverIsWindows && !file_exists($path.$name.'.exe')) || (!$this->serverIsWindows && !file_exists($path.$name))) {
                 
-                $error_msg = 'Unable to find "'.$name.'" tool at location "'.$path.$name.'"';
+                // Error message.
+                $errorMsg = 'Unable to find "'.$name.'" tool at location "'.$path.$name.'"';
                 
                 // Logger.
-                $this->logger->error($error_msg);
+                $this->logger->error($errorMsg);
                 
-                echo $error_msg;
-                exit;
+                throw new XsgaFileNotFoundException($errorMsg);
                 
             }//end if
 
@@ -1333,7 +1353,10 @@ class WebSvnConfig extends XsgaAbstractClass
     public function _updateSVNCommand()
     {
         $this->_setPath($this->svn, $this->_svnCommandPath, 'svn', '--non-interactive --config-dir '.$this->_svnConfigDir.($this->_svnTrustServerCert ? ' --trust-server-cert' : ''));
-        $this->svn = $this->_svnCommandPrefix.' '.$this->svn;
+        $this->_setPath($this->svnAuthz, $this->_svnCommandPath, 'svnauthz', 'accessof');
+        
+        $this->svn      = trim($this->_svnCommandPrefix.' '.$this->svn);
+        $this->svnAuthz = trim($this->_svnCommandPrefix.' '.$this->svnAuthz);
         
     }//end _updateSVNCommand()
     
@@ -1350,6 +1373,21 @@ class WebSvnConfig extends XsgaAbstractClass
         return $this->svn;
         
     }//end getSvnCommand()
+    
+    
+    /**
+     * Get SVN Authz.
+     * 
+     * @return string
+     * 
+     * @access public
+     */
+    public function getSvnAuthzCommand()
+    {
+        
+        return $this->svnAuthz;
+        
+    }//end getSvnAuthzCommand()
     
     
     /**
@@ -1545,13 +1583,13 @@ class WebSvnConfig extends XsgaAbstractClass
             $this->defaultFileDlMode = $dlmode;
         } else {
             
-            $error_msg = 'Setting default file download mode to an invalid value "'.$dlmode.'"';
+            // Error message.
+            $errorMsg = 'Setting default file download mode to an invalid value "'.$dlmode.'"';
             
             // Logger.
-            $this->logger->error($error_msg);
+            $this->logger->error($errorMsg);
             
-            echo $error_msg;
-            exit;
+            throw new XsgaException($errorMsg);
             
         }//end if
         
@@ -1573,7 +1611,7 @@ class WebSvnConfig extends XsgaAbstractClass
     
     
     /**
-     * Define the default folder download mode - one of [gzip, zip].
+     * Define the default directory download mode - one of [gzip, zip].
      * 
      * @param string $dlmode Download mode.
      * 
@@ -1581,23 +1619,22 @@ class WebSvnConfig extends XsgaAbstractClass
      * 
      * @access public
      */
-    public function setDefaultFolderDlMode($dlmode)
+    public function setDefaultDirectoryDlMode($dlmode)
     {
-        if (in_array($dlmode, $this->validFolderDlModes)) {
-            $this->defaultFolderDlMode = $dlmode;
+        if (in_array($dlmode, $this->validDirectoryDlModes)) {
+            $this->defaultDirectoryDlMode = $dlmode;
         } else {
             
-            $error_msg = 'Setting default file download mode to an invalid value "'.$dlmode.'"';
+            $errorMsg = 'Setting default directory download mode to an invalid value "'.$dlmode.'"';
             
             // Logger.
-            $this->logger->error($error_msg);
+            $this->logger->error($errorMsg);
             
-            echo $error_msg;
-            exit;
+            throw new XsgaException($errorMsg);
             
         }//end if
         
-    }//end setDefaultFolderDlMode()
+    }//end setDefaultDirectoryDlMode()
     
     
     /**
@@ -1607,11 +1644,11 @@ class WebSvnConfig extends XsgaAbstractClass
      * 
      * @access public
      */
-    public function getDefaultFolderDlMode()
+    public function getDefaultDirectoryDlMode()
     {
-        return $this->defaultFolderDlMode;
+        return $this->defaultDirectoryDlMode;
         
-    }//end getDefaultFolderDlMode()
+    }//end getDefaultDirectoryDlMode()
     
     
     /**
@@ -1685,15 +1722,16 @@ class WebSvnConfig extends XsgaAbstractClass
      */
     public function getTemplatePath()
     {
+        
         if (count($this->templatePaths) === 0) {
             
-            $error_msg = 'No template path added in config file';
+            // Error message.
+            $errorMsg = 'No template path added in config file';
             
             // Logger.
-            $this->logger->error($error_msg);
+            $this->logger->error($errorMsg);
             
-            echo $error_msg;
-            exit;
+            throw new XsgaException($errorMsg);
             
         }//end if
         
@@ -1943,56 +1981,55 @@ class WebSvnConfig extends XsgaAbstractClass
      * 
      * @param string $file
      * @param string $myrep
-     * @param string $basicRealm
      * 
      * @return void
      * 
      * @access public
      */
-    public function useAuthenticationFile($file, $myrep = '', $basicRealm = false)
+    public function useAccessFile($file, $myrep = '')
     {
         if (empty($myrep)) {
             
             if (is_readable($file)) {
                 
-                if ($this->auth === null) {
-                    $this->auth = new Authentication($basicRealm);
+                if ($this->authz === null) {
+                    $this->authz = new Authorization($this->getSvnAuthzCommand());
                 }//end if
                 
-                $this->auth->addAccessFile($file);
+                $this->authz->addAccessFile($file);
                 
             } else {
                 
-                $error_msg = 'Unable to read authentication file "'.$file.'"';
+                // Error message.
+                $errorMsg = 'Unable to read access file "'.$file.'"';
                 
                 // Logger.
-                $this->logger->error($error_msg);
+                $this->logger->error($errorMsg);
                 
-                echo $error_msg;
-                exit;
+                throw new XsgaException($errorMsg);
                 
             }//end if
             
         } else {
             
             $repo =& $this->findRepository($myrep);
-            $repo->useAuthenticationFile($file);
+            $repo->useAccessFile($file);
             
         }//end if
         
-    }//end useAuthenticationFile()
+    }//end useAccessFile()
     
     
     /**
-     * Get authentication.
+     * Get authorization.
      * 
-     * @return Authentication
+     * @return Authorization
      * 
      * @access public
      */
-    public function &getAuth()
+    public function &getAuthz()
     {
-        return $this->auth;
+        return $this->authz;
         
     }//end getAuth()
     

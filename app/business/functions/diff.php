@@ -35,17 +35,9 @@ use app\business\setup\Setup;
 use app\business\diff\ListingHelper;
 use app\business\diff\SensibleLineChanges;
 use app\business\diff\LineDiff;
-
-/**
- * Get space.
- * 
- * @return string
- */
-function getSpace()
-{
-    return '&nbsp;';
-    
-}//end getSpace()
+use log4php\Logger;
+use xsgaphp\exceptions\XsgaException;
+use app\business\setup\WebSvnCons;
 
 
 /**
@@ -122,8 +114,10 @@ function getWrappedLineFromFile($file, $is_highlighted, Setup $setup)
         $line = escape($line);
     }//end if
     
+    $line = rtrim($line, "\n\r");
+    
     if (strip_tags($line) === '') {
-        $line = getSpace();
+        $line = WebSvnCons::ANDNBSP;
     }//end if
     
     return $setup->utils->wrapInCodeTagIfNecessary($line, $setup->config->getUseGeshi());
@@ -181,7 +175,7 @@ function diff_result($all, $highlighted, $newtname, $oldtname, $obj, $ignoreWhit
             } else {
                 
                 $tmpoline = '?';
-                $text1 = getSpace();
+                $text1 = WebSvnCons::ANDNBSP;
                 
             }//end if
             
@@ -194,7 +188,7 @@ function diff_result($all, $highlighted, $newtname, $oldtname, $obj, $ignoreWhit
             } else {
                 
                 $tmpnline = '?';
-                $text2 = getSpace();
+                $text2 = WebSvnCons::ANDNBSP;
                 
             }//end if
             
@@ -221,7 +215,7 @@ function diff_result($all, $highlighted, $newtname, $oldtname, $obj, $ignoreWhit
                 
             } else {
                 
-                $mod = $line{0};
+                $mod = $line[0];
                 $line = rtrim(substr($line, 1));
                 
                 switch ($mod) {
@@ -278,7 +272,7 @@ function diff_result($all, $highlighted, $newtname, $oldtname, $obj, $ignoreWhit
                 $noneof = true;
             } else {
                 $tmpoline = '-';
-                $text1 = getSpace();
+                $text1 = WebSvnCons::ANDNBSP;
             }//end if
             
             
@@ -289,7 +283,7 @@ function diff_result($all, $highlighted, $newtname, $oldtname, $obj, $ignoreWhit
                 $noneof = true;
             } else {
                 $tmpnline = '-';
-                $text2 = getSpace();
+                $text2 = WebSvnCons::ANDNBSP;
             }//end if
             
             if ($noneof) {
@@ -325,6 +319,9 @@ function diff_result($all, $highlighted, $newtname, $oldtname, $obj, $ignoreWhit
 function command_diff($all, $ignoreWhitespace, $highlighted, $newtname, $oldtname, $newhlname, $oldhlname, Setup $setup)
 {
     
+    // Get logger.
+    $logger = Logger::getRootLogger();
+    
     $context = 5;
     
     if ($all) {
@@ -339,64 +336,20 @@ function command_diff($all, $ignoreWhitespace, $highlighted, $newtname, $oldtnam
     }//wnd if
     
     // Open a pipe to the diff command with $context lines of context.
-    $cmd            = quoteCommand($setup->config->diff.$whitespaceFlag.' -U '.$context.' "'.$oldtname.'" "'.$newtname.'"');
-    $descriptorspec = array(0 => array('pipe', 'r'), 1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
+    $cmd  = $setup->config->diff.$whitespaceFlag.' -U '.$context.' "'.$oldtname.'" "'.$newtname.'"';
+    $diff = runCommand($cmd);
     
-    $resource = proc_open($cmd, $descriptorspec, $pipes);
-    $error    = '';
+    // Ignore the 3 header lines:
+    $line = array_shift($diff);
+    $line = array_shift($diff);
     
-    if (is_resource($resource)) {
-        // We don't need to write.
-        fclose($pipes[0]);
-        
-        $diff = $pipes[1];
-        
-        // Ignore the 3 header lines.
-        fgets($diff);
-        fgets($diff);
-        
-        $setup->arrayBased = false;
-        $setup->fileBased = true;
-        
-        if ($highlighted) {
-            $listing = diff_result($all, $highlighted, $newhlname, $oldhlname, $diff, $ignoreWhitespace, $setup);
-        } else {
-            $listing = diff_result($all, $highlighted, $newtname, $oldtname, $diff, $ignoreWhitespace, $setup);
-        }//end if
-        
-        fclose($pipes[1]);
-        
-        while (!feof($pipes[2])) {
-            $error .= fgets($pipes[2]);
-        }//end while
-        
-        $error = toOutputEncoding(trim($error));
-        
-        if (!empty($error)) {
-            $error = '<p>'.$setup->lang['BADCMD'].': <code>'.$cmd.'</code></p><p>'.nl2br($error).'</p>';
-        }//end if
-        
-        fclose($pipes[2]);
-        
-        proc_close($resource);
-        
+    $setup->arrayBased = true;
+    $setup->fileBased  = false;
+    
+    if ($highlighted) {
+        $listing = diff_result($all, $highlighted, $newhlname, $oldhlname, $diff, $ignoreWhitespace);
     } else {
-        $error = '<p>'.$setup->lang['BADCMD'].': <code>'.$cmd.'</code></p>';
-    }//end if
-    
-    if (!empty($error)) {
-        echo $error;
-        
-        if (is_resource($resource)) {
-            fclose($pipes[0]);
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-            
-            proc_close($resource);
-        }//end if
-        
-        exit;
-        
+        $listing = diff_result($all, $highlighted, $newtname, $oldtname, $diff, $ignoreWhitespace);
     }//end if
     
     return $listing;
@@ -429,7 +382,7 @@ function inline_diff($all, $ignoreWhitespace, $highlighted, $newtname, $oldtname
     
     // Modify error reporting level to suppress deprecated/strict warning "Assigning the return value of new by reference".
     $bckLevel    = error_reporting();
-    $removeLevel = 0;
+    $removeLevel = E_DEPRECATED;
     $modLevel = $bckLevel & (~$removeLevel);
     error_reporting($modLevel);
     

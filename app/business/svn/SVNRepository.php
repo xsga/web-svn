@@ -213,7 +213,7 @@ class SVNRepository extends XsgaAbstractClass
         
         if (array_key_exists($filename, $this->setup->extEnscript)) {
             $lang = $this->setup->extEnscript[$filename];
-        } else if (array_key_exists($ext, $this->setup->extEnscript)) {
+        } else if ($ext && array_key_exists($ext, $this->setup->extEnscript)) {
             $lang = $this->setup->extEnscript[$ext];
         }//end if
         
@@ -280,30 +280,20 @@ class SVNRepository extends XsgaAbstractClass
             // Note that the sed command returns only the part of the file between <PRE> and </PRE>.
             // It's complicated because it's designed not to return those lines themselves.
             $cmd = $this->svnCommandString('cat', $path, $rev, $peg);
-            $cmd = quoteCommand($cmd.' | '.$this->enscriptCommandString($path).' | '.$config->sed.' -n '.$this->setup->config->quote.'1,/^<PRE.$/!{/^<\\/PRE.$/,/^<PRE.$/!p;}'.$this->setup->config->quote.' > '.$tempname);
+            $cmd = $cmd.' | '.$this->enscriptCommandString($path).' | '.$this->setup->config->sed.' -n '.$this->setup->config->quote.'1,/^<PRE.$/!{/^<\\/PRE.$/,/^<PRE.$/!p;}'.$this->setup->config->quote.' > '.$tempname;
             
         } else {
             
             $highlighted = false;
             $cmd = $this->svnCommandString('cat', $path, $rev, $peg);
-            $cmd = quoteCommand($cmd.' > '.quote($filename));
+            $cmd = $cmd.' > '.quote($filename);
             
         }//end if
         
         if (isset($cmd)) {
             
-            // Stderr.
-            $descriptorspec = array(2 => array('pipe', 'w'));
-            $resource = proc_open($cmd, $descriptorspec, $pipes);
-            $error = '';
-            
-            while (!feof($pipes[2])) {
-                $error .= fgets($pipes[2]);
-            }//end while
-            
-            $error = trim($error);
-            fclose($pipes[2]);
-            proc_close($resource);
+            $error  = '';
+            $output = runCommand($cmd, true, $error);
             
             if (!empty($error)) {
                 error_log($this->setup->lang['BADCMD'].': '.$cmd);
@@ -409,18 +399,9 @@ class SVNRepository extends XsgaAbstractClass
     {
         
         // Output the file to the filename.
-        $cmd            = quoteCommand($this->svnCommandString('cat', $path, $rev, $peg).' > '.quote($filename));
-        $descriptorspec = array(2 => array('pipe', 'w')); // stderr
-        $resource       = proc_open($cmd, $descriptorspec, $pipes);
-        
-        $error = '';
-        while (!feof($pipes[2])) {
-            $error .= fgets($pipes[2]);
-        }//end while
-        
-        $error = trim($error);
-        fclose($pipes[2]);
-        proc_close($resource);
+        $error  = '';
+        $cmd    = $this->svnCommandString('cat', $path, $rev, $peg).' > '.quote($filename);
+        $output = runCommand($cmd, true, $error);
         
         if (!empty($error)) {
             error_log($this->setup->lang['BADCMD'].': '.$cmd);
@@ -540,18 +521,9 @@ class SVNRepository extends XsgaAbstractClass
     public function getBlameDetails($path, $filename, $rev = 0, $peg = '')
     {
         
-        $cmd            = quoteCommand($this->svnCommandString('blame', $path, $rev, $peg).' > '.quote($filename));
-        $descriptorspec = array(2 => array('pipe', 'w')); // stderr
-        $resource       = proc_open($cmd, $descriptorspec, $pipes);
-        
-        $error = '';
-        while (!feof($pipes[2])) {
-            $error .= fgets($pipes[2]);
-        }//end while
-        
-        $error = trim($error);
-        fclose($pipes[2]);
-        proc_close($resource);
+        $error  = '';
+        $cmd    = $this->svnCommandString('blame', $path, $rev, $peg).' > '.quote($filename);
+        $output = runCommand($cmd, true, $error);
         
         if (!empty($error)) {
             error_log($this->setup->lang['BADCMD'].': '.$cmd);
@@ -560,6 +532,79 @@ class SVNRepository extends XsgaAbstractClass
         }//end if
         
     }//end getBlameDetails()
+    
+    
+    /**
+     * XML parse CMD output.
+     * 
+     * @param string   $cmd
+     * @param callable $startElem
+     * @param callable $endElem
+     * @param callable $charData
+     * 
+     * @return void
+     * 
+     * @access public
+     */
+    public function _xmlParseCmdOutput($cmd, $startElem, $endElem, $charData)
+    {
+        
+        $error      = '';
+        $lines      = runCommand($cmd, false, $error);
+        $linesCnt   = count($lines);
+        $xml_parser = xml_parser_create('UTF-8');
+        
+        xml_parser_set_option($xml_parser, XML_OPTION_CASE_FOLDING, true);
+        xml_set_element_handler($xml_parser, $startElem, $endElem);
+        xml_set_character_data_handler($xml_parser, $charData);
+        
+        for ($i = 0; $i < $linesCnt; ++$i) {
+            
+            $line   = $lines[$i];
+            $isLast = $i === ($linesCnt - 1);
+            
+            if (xml_parse($xml_parser, $line, $isLast)) {
+                continue;
+            }//end if
+            
+            $errorMsg = sprintf('XML error: %s (%d) at line %d column %d byte %d'."\n".'cmd: %s',
+                    xml_error_string(xml_get_error_code($xml_parser)),
+                    xml_get_error_code($xml_parser),
+                    xml_get_current_line_number($xml_parser),
+                    xml_get_current_column_number($xml_parser),
+                    xml_get_current_byte_index($xml_parser),
+                    $cmd);
+            
+            if (xml_get_error_code($xml_parser) === 5) {
+                break;
+            }//end if
+            
+            // Errors can contain sensitive info! don't echo this ~J
+            error_log($errorMsg);
+            exit;
+            
+        }//end for
+        
+        xml_parser_free($xml_parser);
+        
+        if (empty($error)) {
+            return;
+        }//end if
+        
+        $error = toOutputEncoding(nl2br(str_replace('svn: ', '', $error)));
+        
+        error_log($this->setup->lang['BADCMD'].': '.$cmd);
+        error_log($error);
+        
+        if (strstr($error, 'found format')) {
+            $this->setup->vars['error'] = 'Repository uses a newer format than Subversion '.$this->setup->config->getSubversionVersion().' can read. ("'.nl2br(escape(toOutputEncoding(substr($error, strrpos($error, 'Expected'))))).'.")';
+        } else if (strstr($error, 'No such revision')) {
+            $this->setup->vars['warning'] = 'Revision '.escape($rev).' of this resource does not exist.';
+        } else {
+            $this->setup->vars['error'] = $this->setup->lang['BADCMD'].': <code>'.escape(stripCredentialsFromCommand($cmd)).'</code><br />'.nl2br(escape(toOutputEncoding($error)));
+        }//end if
+        
+    }//end _xmlParseCmdOutput()
     
     
     /**
@@ -577,7 +622,7 @@ class SVNRepository extends XsgaAbstractClass
     {
         
         $cmd        = $this->svnCommandString('proplist', $path, $rev, $peg);
-        $ret        = runCommand($cmd, $this->setup->lang, true);
+        $ret        = runCommand($cmd, true);
         $properties = array();
         
         if (is_array($ret)) {
@@ -609,7 +654,7 @@ class SVNRepository extends XsgaAbstractClass
     {
         
         $cmd = $this->svnCommandString('propget '.$property, $path, $rev, $peg);
-        $ret = runCommand($cmd, $this->setup->lang, true);
+        $ret = runCommand($cmd, true);
         
         // Remove the surplus newline.
         if (count($ret)) {
@@ -664,14 +709,9 @@ class SVNRepository extends XsgaAbstractClass
     public function getInfo($path, $rev = 0, $peg = '')
     {
         
-        $xml_parser = xml_parser_create('UTF-8');
-        xml_parser_set_option($xml_parser, XML_OPTION_CASE_FOLDING, true);
-        xml_set_element_handler($xml_parser, array($this->svnLook, 'infoStartElement'), array($this->svnLook, 'infoEndElement'));
-        xml_set_character_data_handler($xml_parser, array($this->svnLook, 'infoCharacterData'));
-        
         // Since directories returned by svn log don't have trailing slashes (:-(), we need to remove.
         // The trailing slash from the path for comparison purposes.
-        if ($path{strlen($path) - 1} === '/' && $path !== '/') {
+        if ($path[strlen($path) - 1] === '/' && $path !== '/') {
             $path = substr($path, 0, -1);
         }//end if
         
@@ -685,89 +725,15 @@ class SVNRepository extends XsgaAbstractClass
             }//end if
         }//end if
         
-        $cmd            = quoteCommand($this->svnCommandString('info --xml', $path, $rev, $peg));
-        $descriptorspec = array(0 => array('pipe', 'r'), 1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
-        $resource       = proc_open($cmd, $descriptorspec, $pipes);
+        $cmd = $this->svnCommandString('info --xml', $path, $rev, $peg);
         
-        if (!is_resource($resource)) {
-            
-            $errorMsg = $this->setup->lang['BADCMD'].': <code>'.escape(stripCredentialsFromCommand($cmd)).'</code>';
-            
-            // Logger.
-            $this->logger->error($errorMsg);
-            
-            echo $errorMsg;
-            exit;
-            
-        }//end if
-        
-        $handle    = $pipes[1];
-        
-        while (!feof($handle)) {
-            
-            $line = fgets($handle);
-            
-            if (!xml_parse($xml_parser, $line, feof($handle))) {
-                
-                $errorMsg = sprintf(
-                        'XML error: %s (%d) at line %d column %d byte %d'."\n".'cmd: %s',
-                        xml_error_string(xml_get_error_code($xml_parser)),
-                        xml_get_error_code($xml_parser),
-                        xml_get_current_line_number($xml_parser),
-                        xml_get_current_column_number($xml_parser),
-                        xml_get_current_byte_index($xml_parser),
-                        $cmd);
-                
-                if (xml_get_error_code($xml_parser) !== 5) {
-                    // Logger error. Errors can contain sensitive info! don't echo this ~J.
-                    $this->logger->error($errorMsg);
-                    exit;
-                } else {
-                    break;
-                }//end if
-                
-            }//end if
-        
-        }//end while
-        
-        $error = '';
-        while (!feof($pipes[2])) {
-            $error .= fgets($pipes[2]);
-        }//end while
-        
-        $error = toOutputEncoding(trim($error));
-        
-        fclose($pipes[0]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        
-        proc_close($resource);
-        xml_parser_free($xml_parser);
-        
-        if (!empty($error)) {
-            
-            $error = toOutputEncoding(nl2br(str_replace('svn: ', '', $error)));
-            error_log($this->setup->lang['BADCMD'].': '.$cmd);
-            error_log($error);
-            
-            if (strstr($error, 'found format')) {
-                $this->setup->vars['error'] = 'Repository uses a newer format than Subversion '.$this->config->getSubversionVersion().' can read. ("'.nl2br(escape(toOutputEncoding(substr($error, strrpos($error, 'Expected'))))).'.")';
-            } else if (strstr($error, 'No such revision')) {
-                $this->setup->vars['warning'] = 'Revision '.escape($rev).' of this resource does not exist.';
-            } else {
-                $this->setup->vars['error'] = $this->setup->lang['BADCMD'].': <code>'.escape(stripCredentialsFromCommand($cmd)).'</code><br />'.nl2br(escape(toOutputEncoding($error)));
-            }//end if
-            
-            return null;
-            
-        }//end if
+        $this->_xmlParseCmdOutput($cmd, array($this->svnLook, 'infoStartElement'), array($this->svnLook, 'infoEndElement'), array($this->svnLook, 'infoCharacterData'));
         
         if ($this->repConfig->subpath !== null) {
             
             if (substr($this->svnLook->curInfo->path, 0, strlen($this->repConfig->subpath) + 1) === '/'. $this->repConfig->subpath) {
                 $this->svnLook->curInfo->path = substr($this->svnLook->curInfo->path, strlen($this->repConfig->subpath) + 1);
             } else {
-                $this->setup->vars['error'] = 'Info entry does not start with subpath for repository with subpath';
                 return null;
             }//end if
             
@@ -792,14 +758,9 @@ class SVNRepository extends XsgaAbstractClass
     public function getList($path, $rev = 0, $peg = '')
     {
         
-        $xml_parser = xml_parser_create('UTF-8');
-        xml_parser_set_option($xml_parser, XML_OPTION_CASE_FOLDING, true);
-        xml_set_element_handler($xml_parser, array($this->svnLook, 'listStartElement'), array($this->svnLook, 'listEndElement'));
-        xml_set_character_data_handler($xml_parser, array($this->svnLook, 'listCharacterData'));
-        
         // Since directories returned by svn log don't have trailing slashes (:-(), we need to remove.
         // the trailing slash from the path for comparison purposes.
-        if ($path{strlen($path) - 1} === '/' && $path !== '/') {
+        if ($path[strlen($path) - 1] === '/' && $path !== '/') {
             $path = substr($path, 0, -1);
         }
         
@@ -815,79 +776,9 @@ class SVNRepository extends XsgaAbstractClass
             }//end if
         }//end if
         
-        $cmd            = quoteCommand($this->svnCommandString('list --xml', $path, $rev, $peg));
-        $descriptorspec = array(0 => array('pipe', 'r'), 1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
-        $resource       = proc_open($cmd, $descriptorspec, $pipes);
+        $cmd = $this->svnCommandString('list --xml', $path, $rev, $peg);
         
-        if (!is_resource($resource)) {
-            // Logger.
-            $this->logger->error('Error running command: '.escape(stripCredentialsFromCommand($cmd)));
-            echo $this->setup->lang['BADCMD'].': <code>'.escape(stripCredentialsFromCommand($cmd)).'</code>';
-            exit;
-        }//end if
-        
-        $handle = $pipes[1];
-        
-        while (!feof($handle)) {
-            
-            $line = fgets($handle);
-            
-            if (!xml_parse($xml_parser, $line, feof($handle))) {
-                
-                $errorMsg = sprintf(
-                        'XML error: %s (%d) at line %d column %d byte %d'."\n".'cmd: %s',
-                        xml_error_string(xml_get_error_code($xml_parser)),
-                        xml_get_error_code($xml_parser),
-                        xml_get_current_line_number($xml_parser),
-                        xml_get_current_column_number($xml_parser),
-                        xml_get_current_byte_index($xml_parser),
-                        $cmd);
-                
-                if (xml_get_error_code($xml_parser) != 5) {
-
-                    // Logger. Errors can contain sensitive info! don't echo this ~J.
-                    $this->logger->error($errorMsg);
-                    exit;
-                    
-                } else {
-                    break;
-                }//end if
-                
-            }//end if
-            
-        }//end while
-        
-        $error = '';
-        while (!feof($pipes[2])) {
-            $error .= fgets($pipes[2]);
-        }//end while
-        
-        $error = toOutputEncoding(trim($error));
-        
-        fclose($pipes[0]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        
-        proc_close($resource);
-        xml_parser_free($xml_parser);
-        
-        if (!empty($error)) {
-            
-            $error = toOutputEncoding(nl2br(str_replace('svn: ', '', $error)));
-            error_log($this->setup->lang['BADCMD'].': '.$cmd);
-            error_log($error);
-            
-            if (strstr($error, 'found format')) {
-                $this->setup->vars['error'] = 'Repository uses a newer format than Subversion '.$this->setup->config->getSubversionVersion().' can read. ("'.nl2br(escape(toOutputEncoding(substr($error, strrpos($error, 'Expected'))))).'.")';
-            } else if (strstr($error, 'No such revision')) {
-                $this->setup->vars['warning'] = 'Revision '.escape($rev).' of this resource does not exist.';
-            } else {
-                $this->setup->vars['error'] = $this->setup->lang['BADCMD'].': <code>'.escape(stripCredentialsFromCommand($cmd)).'</code><br />'.nl2br(escape(toOutputEncoding($error)));
-            }//end if
-            
-            return null;
-            
-        }//end if
+        $this->_xmlParseCmdOutput($cmd, array($this->svnLook, 'listStartElement'), array($this->svnLook, 'listEndElement'), array($this->svnLook, 'listCharacterData'));
         
         // Sort the entries into alphabetical order.
         usort($this->svnLook->curList->entries, array($this->svnLook, '_listSort'));
@@ -900,28 +791,24 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Get log.
      * 
-     * @param string $path
-     * @param string $brev
-     * @param number $erev
-     * @param string $quiet
-     * @param number $limit
-     * @param string $peg
+     * @param string  $path
+     * @param string  $brev
+     * @param number  $erev
+     * @param boolean $quiet
+     * @param number  $limit
+     * @param string  $peg
+     * @param boolean $verbose
      * 
      * @return SVNLog
      * 
      * @access public
      */
-    public function getLog($path, $brev = '', $erev = 1, $quiet = false, $limit = 2, $peg = '')
+    public function getLog($path, $brev = '', $erev = 1, $quiet = false, $limit = 2, $peg = '', $verbose = false)
     {
-        
-        $xml_parser = xml_parser_create('UTF-8');
-        xml_parser_set_option($xml_parser, XML_OPTION_CASE_FOLDING, true);
-        xml_set_element_handler($xml_parser, array($this->svnLook, 'logStartElement'), array($this->svnLook, 'logEndElement'));
-        xml_set_character_data_handler($xml_parser, array($this->svnLook, 'logCharacterData'));
         
         // Since directories returned by svn log don't have trailing slashes (:-(),
         // we must remove the trailing slash from the path for comparison purposes.
-        if ($path !== '/' && $path{strlen($path) - 1} == '/') {
+        if ($path !== '/' && $path[strlen($path) - 1] === '/') {
             $path = substr($path, 0, -1);
         }//end if
         
@@ -932,87 +819,10 @@ class SVNRepository extends XsgaAbstractClass
         // Get the log info.
         $effectiveRev = ($brev && $erev ? $brev.':'.$erev : ($brev ? $brev.':1' : ''));
         $effectivePeg = ($peg ? $peg : ($brev ? $brev : ''));
-        $cmd          = quoteCommand($this->svnCommandString(
-                'log --xml '.($quiet ? '--quiet' : '--verbose'), 
-                $path, $effectiveRev, 
-                $effectivePeg));
         
-        if (($this->config->subversionMajorVersion > 1 || $this->config->subversionMinorVersion >= 2) && $limit !== 0) {
-            $cmd .= ' --limit '.$limit;
-        }//end if
+        $cmd = $this->svnCommandString('log --xml '.($verbose ? '--verbose' : ($quiet ? '--quiet' : '')).($limit !== 0 ? ' --limit '.$limit : ''), $path, $effectiveRev, $effectivePeg);
         
-        $descriptorspec = array(0 => array('pipe', 'r'), 1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
-        $resource       = proc_open($cmd, $descriptorspec, $pipes);
-        
-        if (!is_resource($resource)) {
-            
-            // Logger.
-            $this->logger->error('Error running comand: '.escape(stripCredentialsFromCommand($cmd)));
-            
-            echo $this->setup->lang['BADCMD'].': <code>'.escape(stripCredentialsFromCommand($cmd)).'</code>';
-            exit;
-            
-        }//end if
-        
-        $handle = $pipes[1];
-        
-        while (!feof($handle)) {
-            
-            $line = fgets($handle);
-            
-            if (!xml_parse($xml_parser, $line, feof($handle))) {
-                
-                $errorMsg = sprintf('XML error: %s (%d) at line %d column %d byte %d'."\n".'cmd: %s',
-                        xml_error_string(xml_get_error_code($xml_parser)),
-                        xml_get_error_code($xml_parser),
-                        xml_get_current_line_number($xml_parser),
-                        xml_get_current_column_number($xml_parser),
-                        xml_get_current_byte_index($xml_parser),
-                        $cmd);
-                
-                if (xml_get_error_code($xml_parser) !== 5) {
-                    // Logger. Errors can contain sensitive info! don't echo this ~J.
-                    $this->logger->error($errorMsg);
-                    exit;
-                } else {
-                    break;
-                }//end if
-                
-            }//end if
-            
-        }//end while
-        
-        $error = '';
-        while (!feof($pipes[2])) {
-            $error .= fgets($pipes[2]);
-        }//end while
-        
-        $error = trim($error);
-        
-        fclose($pipes[0]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        
-        proc_close($resource);
-        
-        if (!empty($error)) {
-            
-            error_log($this->setup->lang['BADCMD'].': '.$cmd);
-            error_log($error);
-            
-            if (strstr($error, 'found format')) {
-                $this->setup->vars['error'] = 'Repository uses a newer format than Subversion '.$this->config->getSubversionVersion().' can read. ("'.nl2br(escape(toOutputEncoding(substr($error, strrpos($error, 'Expected'))))).'.")';
-            } else if (strstr($error, 'No such revision')) {
-                $this->setup->vars['warning'] = 'Revision '.escape($brev).' of this resource does not exist.';
-            } else {
-                $this->setup->vars['error'] = $this->setup->lang['BADCMD'].': <code>'.escape(stripCredentialsFromCommand($cmd)).'</code><br />'.nl2br(escape(toOutputEncoding($error)));
-            }//end if
-            
-            return null;
-            
-        }//end if
-        
-        xml_parser_free($xml_parser);
+        $this->_xmlParseCmdOutput($cmd, array($this->svnLook, 'logStartElement'), array($this->svnLook, 'logEndElement'), array($this->svnLook, 'logCharacterData'));
         
         foreach ($this->svnLook->curLog->entries as $entryKey => $entry) {
             
@@ -1022,7 +832,7 @@ class SVNRepository extends XsgaAbstractClass
             
             foreach ($entry->mods as $modKey => $mod) {
                 
-                $access = $this->repConfig->hasReadAccess($mod->path);
+                $access = $this->repConfig->hasLogReadAccess($mod->path);
                 
                 if ($access) {
                     
@@ -1052,23 +862,23 @@ class SVNRepository extends XsgaAbstractClass
                         $precisePath = $equalPart;
                     }//end if
                     
+                    // Fix paths if command was for a subpath repository.
+                    if ($this->repConfig->subpath !== null) {
+                        
+                        if (substr($mod->path, 0, strlen($this->repConfig->subpath) + 1) === '/'. $this->repConfig->subpath) {
+                            $this->svnLook->curLog->entries[$entryKey]->mods[$modKey]->path = substr($mod->path, strlen($this->repConfig->subpath) + 1);
+                        } else {
+                            // Hide modified entry when file is out of subpath.
+                            unset($this->svnLook->curLog->entries[$entryKey]->mods[$modKey]);
+                        }//end if
+                        
+                    }//end if
+                    
                 } else {
                     
                     // Hide modified entry when access is prohibited.
                     unset($this->svnLook->curLog->entries[$entryKey]->mods[$modKey]);
                     $fullModAccess = false;
-                    
-                }//end if
-                
-                // Fix paths if command was for a subpath repository.
-                if ($this->repConfig->subpath !== null) {
-                    
-                    if (substr($mod->path, 0, strlen($this->repConfig->subpath) + 1) === '/'. $this->repConfig->subpath) {
-                        $this->svnLook->curLog->entries[$entryKey]->mods[$modKey]->path = substr($mod->path, strlen($this->repConfig->subpath) + 1);
-                    } else {
-                        $this->setup->vars['error'] = 'Log entries do not start with subpath for repository with subpath';
-                        return null;
-                    }//end if
                     
                 }//end if
                 
@@ -1116,7 +926,7 @@ class SVNRepository extends XsgaAbstractClass
         
         $cmd = $this->svnCommandString('info --xml', $path, $rev, $peg);
         
-        return strpos(implode(' ', runCommand($cmd, $this->setup->lang, true)), 'kind="file"') !== false;
+        return strpos(implode(' ', runCommand($cmd, true)), 'kind="file"') !== false;
         
     }//end isFile()
     

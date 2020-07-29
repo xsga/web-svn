@@ -36,9 +36,10 @@ namespace app\business\repository;
 /**
  * Used classes.
  */
-use app\business\utils\Authentication;
 use app\business\setup\WebSvnConfig;
 use xsgaphp\XsgaAbstractClass;
+use xsgaphp\exceptions\XsgaException;
+use app\business\utils\Authorization;
 
 /**
  * Repository class.
@@ -211,20 +212,11 @@ class Repository extends XsgaAbstractClass
     /**
      * Authentication class.
      * 
-     * @var Authentication
+     * @var Authorization
      * 
      * @access public
      */
-    public $auth = null;
-    
-    /**
-     * Auth basic realm.
-     * 
-     * @var string
-     * 
-     * @access public
-     */
-    public $authBasicRealm;
+    public $authz = null;
     
     /**
      * Template path.
@@ -452,7 +444,7 @@ class Repository extends XsgaAbstractClass
     public function addAllowedDownloadException($path)
     {
         
-        if ($path{strlen($path) - 1} != '/') {
+        if ($path[strlen($path) - 1] !== '/') {
             $path .= '/';
         }//end if
         
@@ -473,7 +465,7 @@ class Repository extends XsgaAbstractClass
     public function addDisallowedDownloadException($path)
     {
         
-        if ($path{strlen($path) - 1} != '/') {
+        if ($path[strlen($path) - 1] !== '/') {
             $path .= '/';
         }//end if
         
@@ -770,84 +762,110 @@ class Repository extends XsgaAbstractClass
     /**
      * Use authentication file.
      * 
-     * @param string  $file       Filename.
-     * @param boolean $basicRealm Basic realm flag.
+     * @param string  $file Filename.
      * 
      * @return void
      * 
      * @access public
      */
-    public function useAuthenticationFile($file, $basicRealm = false)
+    public function useAccessFile($file)
     {
         
         if (is_readable($file)) {
             
             if ($this->auth === null) {
-                $this->auth = new Authentication($basicRealm);
+                $this->auth = new Authorization($this->config->getSvnAuthzCommand());
             }//end if
             
-            $this->auth->addAccessFile($file);
+            $this->authz->addAccessFile($file);
             
         } else {
             
-            // Logger.
-            $this->logger->error('Unable to read authentication file "'.$file.'"');
+            // Error message.
+            $errorMsg = 'Unable to read access file "'.$file.'"';
             
-            exit;
+            // Logger.
+            $this->logger->error($errorMsg);
+            
+            throw new XsgaException($errorMsg);
             
         }//end if
         
-    }//end useAuthenticationFile()
+    }//end useAccessFile()
     
     
     /**
      * Get authentication.
      * 
-     * @return Authentication
+     * @return Authorization
      * 
      * @access public
      */
-    public function &getAuth()
+    public function &getAuthz()
     {
 
         $a = null;
         
-        if ($this->auth !== null) {
-            $a =& $this->auth;
+        if ($this->authz !== null) {
+            $a =& $this->authz;
+        } else {
+            $a =& $this->config->getAuthz();
         }//end if
         
         return $a;
         
-    }//end getAuth()
+    }//end getAuthz()
+    
+    
+    /**
+     * Get path.
+     * 
+     * @param string $path
+     * 
+     * @return string
+     * 
+     * @access public
+     */
+    public function _getPathWithSubIf($pathWoSub)
+    {
+        
+        if (!$this->subpath) {
+            return $pathWoSub;
+        }//end if
+        
+        return '/'.$this->subpath.$pathWoSub;
+        
+    }//end _getAuthzPath()    
     
     
     /**
      * Has read acces.
      * 
-     * @param string  $path            Path.
-     * @param boolean $checkSubFolders Subfolders flag.
+     * @param string  $path         Path.
+     * @param boolean $checkSubDirs Subfolders flag.
      * 
      * @return boolean
      * 
      * @access public
      */
-    public function hasReadAccess($path, $checkSubFolders = false)
+    public function hasReadAccess($pathWoSub, $checkSubDirs = false)
     {
         
-        $a =& $this->getAuth();
+        $path =  $this->_getPathWithSubIf($pathWoSub);
+        $a    =& $this->getAuthz();
         
         if (!empty($a)) {
-            return $a->hasReadAccess($this->svnName, $path, $checkSubFolders);
+            return $a->hasReadAccess($this->svnName, $path, $checkSubDirs);
         }//end if
         
-        // No auth file - free access.
+        // No access file - free access.
         return true;
         
     }//end hasReadAccess()
     
     
     /**
-     * Has unrestricted read access.
+     * Has log read access.
      * 
      * @param string $path Path.
      * 
@@ -855,16 +873,42 @@ class Repository extends XsgaAbstractClass
      * 
      * @access public
      */
-    public function hasUnrestrictedReadAccess($path)
+    public function hasLogReadAccess($pathWithSub)
     {
         
-        $a =& $this->getAuth();
+        $path =  $pathWithSub;
+        $a    =& $this->getAuthz();
+        
+        if (!empty($a)) {
+            return $a->hasReadAccess($this->svnName, $path, false);
+        }//end if
+        
+        // No access file - free access...
+        return true;
+        
+    }//end hasLogReadAccess()
+    
+    
+    /**
+     * Has unrestricted read access.
+     * 
+     * @param string $pathWoSub
+     * 
+     * @return boolean
+     * 
+     * @access public
+     */
+    public function hasUnrestrictedReadAccess($pathWoSub)
+    {
+        
+        $path =  $this->_getPathWithSubIf($pathWoSub);
+        $a    =& $this->getAuthz();
         
         if (!empty($a)) {
             return $a->hasUnrestrictedReadAccess($this->svnName, $path);
         }//end if
         
-        // No auth file - free access.
+        // No access file - free access.
         return true;
         
     }//end hasUnrestrictedReadAccess()

@@ -49,12 +49,12 @@ $lang["LINE"] = "Línia";
 $lang["LINENO"] = "Línia núm.";
 $lang["SHOWENTIREFILE"] = "Mostra el fitxer sencer";
 $lang["SHOWCOMPACT"] = "Mostra només les àrees amb diferències";
-// $lang["IGNOREWHITESPACE"] = "Ignore whitespace";
-// $lang["REGARDWHITESPACE"] = "Regard whitespace";
+$lang["IGNOREWHITESPACE"] = "Ignora espais en blanc";
+$lang["REGARDWHITESPACE"] = "Veure espais en blanc";
 
-// $lang["LISTING"] = "Directory listing";
-// $lang["FILEDETAIL"] = "Details";
-// $lang["VIEWAS"] = "View as";
+$lang["LISTING"] = "Llistat del directori";
+$lang["FILEDETAIL"] = "Detalls";
+$lang["VIEWAS"] = "Veure com";
 $lang["DIFFPREV"] = "Compara amb l'anterior";
 $lang["BLAME"] = "Culpa";
 $lang["BLAMEFOR"] = "Informació de culpa per a la revisió";
@@ -75,7 +75,7 @@ $lang["AUTHOR"] = "Autor";
 $lang["AGE"] = "Edat";
 $lang["CURDIR"] = "Directori actual";
 $lang["TARBALL"] = "Arxiu tar";
-// $lang["DOWNLOAD"] = "Download";
+$lang["DOWNLOAD"] = "Descarregar";
 
 $lang["PREV"] = "Anterior";
 $lang["NEXT"] = "Següent";
@@ -84,7 +84,7 @@ $lang["SHOWALL"] = "Mostra-ho tot";
 $lang["BADCMD"] = "S'ha produït un error en exectuar aquesta ordre";
 $lang["UNKNOWNREVISION"] = "No s'ha trobat la revisió";
 
-$lang["POWERED"] = "Funciona amb <a href=\"http://www.websvn.info/\">WebSVN</a>";
+$lang["POWERED"] = "Funciona amb <a href=\"https://websvnphp.github.io/\">WebSVN</a>";
 $lang["PROJECTS"] = "Dipòsits de Subversion";
 $lang["SERVER"] = "Servidor de Subversion";
 
@@ -119,3 +119,12 @@ $lang["COMPPATH"] = "Camí de comparació:";
 $lang["WITHPATH"] = "Amb el camí:";
 $lang["FILEDELETED"] = "Fitxer suprimit";
 $lang["FILEADDED"] = "Nou fitxer";
+
+$lang["ERROR403"] = "Accés no autoritzat";
+$lang["ERROR404"] = "Pàgina no trobada";
+$lang["ERROR500"] = "Error del sistema";
+
+$lang["ERROR403DESC"] = "No es disposa dels permissos necessàris per a accedir al contingut sel·leccionat.";
+$lang["ERROR404DESC"] = "No es pot accedir a la pàgina sol·licitada ja que no s'ha trobat el contingut a mostrar.";
+$lang["ERROR500DESC"] = "S'ha produït un error intern del sistema.";
+$lang["ERRORDESC"]    = "Revisi els registres de log del sistema per a obtenir més informació o contacti amb l'administrador del lloc.";

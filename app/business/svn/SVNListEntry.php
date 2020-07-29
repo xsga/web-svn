@@ -105,7 +105,7 @@ class SVNListEntry extends XsgaAbstractClass
      * 
      * @access public
      */
-    public $isdir = false;
+    public $isdir = null;
     
     
 }//end SVNListEntry class.

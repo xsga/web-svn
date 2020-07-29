@@ -85,7 +85,7 @@
 /*
  * ZIP PATH
  * 
- * Download folder/file zipped. Path to ZIP if isn't on your path.
+ * Download directory/file zipped. Path to ZIP if isn't on your path.
  */
 //$this->config->setZipPath('Path/to/zip/command/');
 
@@ -208,9 +208,9 @@ $this->config->setTemplatePath($this->locwebsvnreal.'/templates/calm/');
 //$this->config->useFlatView();
 
 /* 
- * By default, WebSVN displays subfolders first and than the files of a directory,
+ * By default, WebSVN displays subdirectories first and than the files of a directory,
  * both alphabetically sorted.
- * To use alphabetic order independent iof folders and files uncomment this line.
+ * To use alphabetic order independent iof directories and files uncomment this line.
  */
 //$this->config->setAlphabeticOrder(true);
 
@@ -223,7 +223,7 @@ $this->config->setTemplatePath($this->locwebsvnreal.'/templates/calm/');
 
 /* 
  * By default, WebSVN displays the information of the last modification
- * (revision, age and author) for each file and folder in an extra column.
+ * (revision, age and author) for each file and directory in an extra column.
  * To disable that uncomment this line.
  */
 //$this->config->setShowLastModInListing(false);
@@ -272,13 +272,13 @@ $this->config->ignoreUserAcceptedLanguages();
  * to the WebSVN (or wsvn) directory as you have for Subversion itself. More information can be
  * found in install.txt
  */
-//$this->config->useAuthenticationFile('/path/to/accessfile'); // Global access file
+//$this->config->useAccessFile('/path/to/accessfile'); // Global access file
 
 /* 
  * You may also specify a per repository access file by uncommenting and copying the following
  * line as necessary. Use the convention 'groupname.myrep' if your repository is in a group.
  */
-//$this->config->useAuthenticationFile('/path/to/accessfile', 'myrep');
+//$this->config->useAccessFile('/path/to/accessfile', 'myrep'); // Access file for myrep
 
 /* 
  * When allowing anonymous access for some repositories and require authentification for others
@@ -315,7 +315,7 @@ $this->config->ignoreUserAcceptedLanguages();
  * If you'd rather that the files were delivered uncompressed with the associated MIME type,
  * then read below.
  */
-//$zipped[] = '.dll';
+//$this->zipped[] = '.dll';
 
 /* 
  * Subversion controlled files have an svn:mime-type property that can
@@ -395,7 +395,7 @@ $this->config->allowDownload();
  * Set download modes.
  */
 $this->config->setDefaultFileDlMode('plain');
-$this->config->setDefaultFolderDlMode('gzip');
+$this->config->setDefaultDirectoryDlMode('gzip');
 
 /* 
  * To change the global option for individual repositories, uncomment and replicate

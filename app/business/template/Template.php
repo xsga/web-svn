@@ -38,6 +38,8 @@ namespace app\business\template;
  */
 use app\business\setup\Setup;
 use xsgaphp\XsgaAbstractClass;
+use xsgaphp\exceptions\XsgaFileNotFoundException;
+use app\business\setup\WebSvnCons;
 
 /**
  * Template class.
@@ -140,7 +142,7 @@ class Template extends XsgaAbstractClass
                 
                 $line = trim($line);
                 $var  = substr($line, 13, -1);
-                $neg  = ($var{0} === '!');
+                $neg  = ($var[0] === '!');
                 
                 if ($neg) {
                     $var = substr($var, 1);
@@ -286,13 +288,13 @@ class Template extends XsgaAbstractClass
         
         if (!is_file($template)) {
             
+            // Error message.
             $errorMsg = 'No template file found ('.$template.')';
             
             // Logger.
             $this->logger->error($errorMsg);
             
-            echo $errorMsg;
-            exit;
+            throw new XsgaFileNotFoundException($errorMsg, WebSvnCons::ERROR_404);
             
         }//end if
         
@@ -429,9 +431,19 @@ class Template extends XsgaAbstractClass
             $this->setup->vars['templateentrypoint'] = $path;
             executePlainPhpTemplate();
         } else {
+            
             $this->parseTemplate('header.tmpl');
+            
+            flush();
+            
             $this->parseTemplate($view . '.tmpl');
+            
+            if ($view === 'directory' || $view === 'log') {
+                print '<script type="text/javascript" src="'.$this->setup->vars['locwebsvnhttp'].'/javascript/compare-checkboxes.js"></script>';
+            }//end if
+            
             $this->parseTemplate('footer.tmpl');
+            
         }//end if
         
     }//end renderTemplate()

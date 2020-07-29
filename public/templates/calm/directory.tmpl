@@ -1,7 +1,7 @@
 [websvn-test:error]
    <div id="error">[websvn:error]</div>
 [websvn-else]
-<h2 id="pathlinks">[websvn:pathlinks] - [lang:REV] [websvn:rev]</h2>
+<h2 id="pathlinks">[websvn:pathlinks] &ndash; [lang:REV] [websvn:rev]</h2>
 <div id="revjump">[websvn:revision_form]<div>[lang:REV] [websvn:revision_input]<span class="submit">[websvn:revision_submit]</span></div>[websvn:revision_endform]</div>
 <p>
 [websvn-test:prevrevurl]
@@ -39,12 +39,11 @@
 </div>
 
 [websvn-defineicons]
-dir=<img src="[websvn:locwebsvnhttp]/templates/calm/images/folder.png" alt="[FOLDER]" class="icon" />
-diropen=<img src="[websvn:locwebsvnhttp]/templates/calm/images/folder.png" alt="[FOLDER]" class="icon" />
+dir=<img src="[websvn:locwebsvnhttp]/templates/calm/images/directory.png" alt="[DIRECOTRY]" class="icon" />
+diropen=<img src="[websvn:locwebsvnhttp]/templates/calm/images/directory.png" alt="[DIRECTORY]" class="icon" />
 *=<img src="[websvn:locwebsvnhttp]/templates/calm/images/file.png" alt="[FILE]" class="icon" />
 .c=<img src="[websvn:locwebsvnhttp]/templates/calm/images/filec.png" alt="[C-FILE]" class="icon" />
 .h=<img src="[websvn:locwebsvnhttp]/templates/calm/images/fileh.png" alt="[H-FILE]" class="icon" />
-.s=<img src="[websvn:locwebsvnhttp]/templates/calm/images/files.png" alt="[S-FILE]" class="icon" />
 .db=<img src="[websvn:locwebsvnhttp]/templates/calm/images/filedb.png" alt="[DB-FILE]" class="icon" />
 .png=<img src="[websvn:locwebsvnhttp]/templates/calm/images/filepaint.png" alt="[DB-FILE]" class="icon" />
 .gif=<img src="[websvn:locwebsvnhttp]/templates/calm/images/filepaint.png" alt="[DB-FILE]" class="icon" />
@@ -68,6 +67,7 @@ e-node=<img src="[websvn:locwebsvnhttp]/templates/calm/images/e-node.png" alt="[
 
 <div id="wrap">
 [websvn:compare_form]
+  <div class="table-responsive">
    <table>
       <thead>
       <tr align="left" valign="middle">
@@ -122,7 +122,8 @@ e-node=<img src="[websvn:locwebsvnhttp]/templates/calm/images/e-node.png" alt="[
       [websvn-endlisting]
       </tbody>
    </table>
-<p class="submit">
+  </div>
+  <p class="submit">
     [websvn:compare_submit]
 </p>
 [websvn:compare_endform]

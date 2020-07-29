@@ -91,8 +91,12 @@ class LineDiff extends XsgaAbstractClass implements LineDiffInterface
             return levenshtein($str1, $str2);
         }//end if
         
-        $n = count($str1);
-        $m = count($str2);
+        $l1 = explode(' ', $str1);
+        $l2 = explode(' ', $str2);
+        
+        $n = count($l1);
+        $m = count($l2);
+        
         $d = array_fill(0, $n + 1, array_fill(0, $m + 1, 0));
         
         for ($i = 1; $i < $n + 1; $i++) {
@@ -102,9 +106,6 @@ class LineDiff extends XsgaAbstractClass implements LineDiffInterface
         for ($j = 1; $j < $m + 1; $j++) {
             $d[0][$j] = $j;
         }//end for
-        
-        $l1 = explode(' ', $str1);
-        $l2 = explode(' ', $str2);
         
         for ($i = 1; $i < $n + 1; $i++) {
             for ($j = 1; $j < $m + 1; $j++) {

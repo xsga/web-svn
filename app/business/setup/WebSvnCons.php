@@ -67,13 +67,58 @@ class WebSvnCons
     const HTTP_500 = 'HTTP/1.x 500 Internal Server Error';
     
     /**
-     * HTML space.
+     * Error code 403.
+     * 
+     * @var integer
+     * 
+     * @access public
+     */
+    const ERROR_403 = 403;
+    
+    /**
+     * Error code 404.
+     *
+     * @var integer
+     *
+     * @access public
+     */
+    const ERROR_404 = 404;
+    
+    /**
+     * Error code 500.
+     *
+     * @var integer
+     *
+     * @access public
+     */
+    const ERROR_500 = 500;
+    
+    /**
+     * HTML &.
      *
      * @var string
      *
      * @access public
      */
     const ANDAMP = '&amp;';
+    
+    /**
+     * HTML space.
+     * 
+     * @var string
+     * 
+     * @access public
+     */
+    const ANDNBSP = '&nbsp;';
+    
+    /**
+     * BR tag.
+     * 
+     * @var string
+     * 
+     * @access public
+     */
+    const BR = '<br/>';
     
     /**
      * Download page error.

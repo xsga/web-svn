@@ -1,6 +1,7 @@
 {
     "name": "xsga/web-svn",
     "description": "A fork of WebSVN",
+    "license": "GPL-3.0-only",
     "autoload": {
         "psr-0": {"": "","xsgaphp": "library/","log4php": "library/"},
         "files": [
@@ -16,6 +17,5 @@
         "geshi/geshi": "1.0.9.1",
         "pear/archive_tar": "1.4.9",
         "pear/text_diff": "1.2.2"
-    },
-    "license": "GPL-3.0-only"
+    }
 }
