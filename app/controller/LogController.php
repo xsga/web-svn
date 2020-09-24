@@ -157,17 +157,8 @@ class LogController extends AbstractController
             $ppath = '/'.$setup->path;
         }//end if
         
-        $setup->vars['action'] = $setup->lang['LOG'];
         $setup->vars['rev']    = $setup->rev;
-        $setup->vars['peg']    = $setup->peg;
         $setup->vars['path']   = escape($ppath);
-        
-        if ($history && isset($history->entries[0])) {
-            $setup->vars['log']    = $setup->utils->xmlEntities($history->entries[0]->msg);
-            $setup->vars['date']   = $history->entries[0]->date;
-            $setup->vars['age']    = $setup->utils->datetimeFormatDuration($setup->lang, time() - strtotime($history->entries[0]->date));
-            $setup->vars['author'] = $history->entries[0]->author;
-        }//end if
         
         if ($max === false) {
             $max = ($dosearch) ? 0 : 40;
@@ -240,7 +231,7 @@ class LogController extends AbstractController
         $setup->vars['showalllink']               = '';
         
         if ($history) {
-            $history = $setup->svnrep->getLog($setup->path, $startrev, $endrev, true, $max, $setup->peg);
+            $history = $setup->svnrep->getLog($setup->path, $startrev, $endrev, false, $max, $setup->peg);
             if (empty($history)) {
                 unset($setup->vars['error']);
                 $setup->vars['warning'] = 'Revision '.$startrev.' of this resource does not exist.';
@@ -283,7 +274,7 @@ class LogController extends AbstractController
             
             $entries = array();
             if ($brev && $erev) {
-                $history = $setup->svnrep->getLog($setup->path, $brev, $erev, true, 0, $setup->peg, $showchanges);
+                $history = $setup->svnrep->getLog($setup->path, $brev, $erev, false, 0, $setup->peg, $showchanges);
                 if ($history) {
                     $entries = $history->entries;
                 }//end if
@@ -362,6 +353,7 @@ class LogController extends AbstractController
                     $listvar['revlog']      = nl2br($bugtraq->replaceIDs($setup->utils->createAnchors($setup->utils->xmlEntities($revision->msg))));
                     $listvar['rowparity']   = $row;
                     $listvar['compareurl']  = $setup->config->getURL($setup->rep, '', 'comp').'compare[]='.urlencode($rpath).'@'.($thisrev - 1).WebSvnCons::ANDAMP.'compare[]='.urlencode($rpath).'@'.$thisrev;
+                                        
                     if ($showchanges) {
                         
                         // Aggregate added/deleted/modified paths for display in table
