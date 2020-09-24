@@ -115,7 +115,7 @@ class Authorization extends XsgaAbstractClass
     /**
      * Add access file.
      * 
-     * @param string $accessFile
+     * @param string $accessFile Access file.
      * 
      * @return void
      * 
@@ -151,9 +151,9 @@ class Authorization extends XsgaAbstractClass
     /**
      * Private function to simplify creation of common SVN authz command string text.
      * 
-     * @param string $repo
-     * @param string $path
-     * @param string $checkSubDirs
+     * @param string  $repo         Repository name.
+     * @param string  $path         Path.
+     * @param boolean $checkSubDirs Check subdirs flag.
      * 
      * @return string
      * 
@@ -162,8 +162,7 @@ class Authorization extends XsgaAbstractClass
     private function svnAuthzCommandString($repo, $path, $checkSubDirs = false)
     {
         
-        //$cmd         = $this->setup->config->getSvnAuthzCommand();
-        $cmd = $this->authzCommand;
+        $cmd         = $this->authzCommand;
         $repoAndPath = '--repository '.quote($repo).' --path '.quote($path);
         $username    = !$this->hasUsername() ? '' : '--username '.quote($this->user);
         $subDirs     = !$checkSubDirs ? '' : '-R';
@@ -177,9 +176,9 @@ class Authorization extends XsgaAbstractClass
     /**
      * Returns true if the user has read access to the given path.
      * 
-     * @param string  $repos
-     * @param string  $path
-     * @param boolean $checkSubDirs
+     * @param string  $repos        Repository name.
+     * @param string  $path         Path.
+     * @param boolean $checkSubDirs Check subdirs flag.
      * 
      * @return boolean
      * 
@@ -230,8 +229,8 @@ class Authorization extends XsgaAbstractClass
     /**
      * Returns true if the user has read access to the given path and too all subdirectories.
      * 
-     * @param string $repos
-     * @param string $path
+     * @param string $repos Repository name.
+     * @param string $path  Path.
      * 
      * @return boolean
      * 

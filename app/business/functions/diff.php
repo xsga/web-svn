@@ -41,9 +41,9 @@ use app\business\setup\WebSvnCons;
 /**
  * Next line.
  * 
- * @param array|resource $obj
- * @param boolean        $arrayBased
- * @param boolean        $fileBased
+ * @param array|resource $obj        Objects.
+ * @param boolean        $arrayBased Array based flag.
+ * @param boolean        $fileBased  File based flag.
  * 
  * @return array|string
  */
@@ -66,9 +66,9 @@ function nextLine(&$obj, $arrayBased, $fileBased)
 /**
  * End of file.
  * 
- * @param array|resource $obj
- * @param boolean        $arrayBased
- * @param boolean        $fileBased
+ * @param array|resource $obj        Objects.
+ * @param boolean        $arrayBased Array based flag.
+ * @param boolean        $fileBased  File based flag.
  * 
  * @return boolean
  */
@@ -91,9 +91,9 @@ function endOfFile($obj, $arrayBased, $fileBased)
 /**
  * Get wrapped line from file.
  * 
- * @param resource $file
- * @param boolean  $is_highlighted
- * @param Setup    $setup
+ * @param resource $file           File resource.
+ * @param boolean  $is_highlighted Highlighted flag.
+ * @param Setup    $setup          Setup instance.
  * 
  * @return boolean|string
  */
@@ -126,13 +126,13 @@ function getWrappedLineFromFile($file, $is_highlighted, Setup $setup)
 /**
  * Diff result.
  * 
- * @param boolean        $all
- * @param boolean        $highlighted
- * @param string         $newtname
- * @param string         $oldtname
- * @param array|resource $obj
- * @param boolean        $ignoreWhitespace
- * @param Setup          $setup
+ * @param boolean        $all              All flag.
+ * @param boolean        $highlighted      Highlighted flag.
+ * @param string         $newtname         New name string.
+ * @param string         $oldtname         Old name string.
+ * @param array|resource $obj              Objects.
+ * @param boolean        $ignoreWhitespace Ignore whitespace flag.
+ * @param Setup          $setup            Setup instance.
  * 
  * @return array
  */
@@ -303,14 +303,14 @@ function diff_result($all, $highlighted, $newtname, $oldtname, $obj, $ignoreWhit
 /**
  * Command diff.
  * 
- * @param boolean $all
- * @param boolean $ignoreWhitespace
- * @param boolean $highlighted
- * @param string  $newtname
- * @param string  $oldtname
- * @param string  $newhlname
- * @param string  $oldhlname
- * @param Setup   $setup
+ * @param boolean $all              All flag.
+ * @param boolean $ignoreWhitespace Ignore whitespace flag.
+ * @param boolean $highlighted      Highlighted flag.
+ * @param string  $newtname         New name.
+ * @param string  $oldtname         Old name.
+ * @param string  $newhlname        New name highlighted.
+ * @param string  $oldhlname        Old name highlighted.
+ * @param Setup   $setup            Setup instance.
  * 
  * @return array
  */
@@ -355,14 +355,14 @@ function command_diff($all, $ignoreWhitespace, $highlighted, $newtname, $oldtnam
 /**
  * Inline diff.
  * 
- * @param boolean $all
- * @param boolean $ignoreWhitespace
- * @param boolean $highlighted
- * @param string  $newtname
- * @param string  $oldtname
- * @param string  $newhlname
- * @param string  $oldhlname
- * @param Setup   $setup
+ * @param boolean $all              All flag.
+ * @param boolean $ignoreWhitespace Ignore whitespace flag.
+ * @param boolean $highlighted      Highlighted flag.
+ * @param string  $newtname         New name.
+ * @param string  $oldtname         Old name.
+ * @param string  $newhlname        New name highlighted.
+ * @param string  $oldhlname        Old name highlighted.
+ * @param Setup   $setup            Setup instance.
  * 
  * @return array
  */
@@ -434,14 +434,14 @@ function inline_diff($all, $ignoreWhitespace, $highlighted, $newtname, $oldtname
 /**
  * Do diff.
  * 
- * @param boolean $all
- * @param boolean $ignoreWhitespace
- * @param boolean $highlighted
- * @param string  $newtname
- * @param string  $oldtname
- * @param string  $newhlname
- * @param string  $oldhlname
- * @param Setup   $setup
+ * @param boolean $all              All flag.
+ * @param boolean $ignoreWhitespace Ignore whitespace flag.
+ * @param boolean $highlighted      Highlighted flag.
+ * @param string  $newtname         New name.
+ * @param string  $oldtname         Old name.
+ * @param string  $newhlname        New name highlighted.
+ * @param string  $oldhlname        Old name highlighted.
+ * @param Setup   $setup            Setup instance.
  * 
  * @return array
  */

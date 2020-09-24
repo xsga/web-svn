@@ -76,12 +76,12 @@ class ListingHelper extends XsgaAbstractClass
     /**
      * Add.
      * 
-     * @param string  $text1
-     * @param integer $lineno1
-     * @param string  $class1
-     * @param string  $text2
-     * @param integer $lineno2
-     * @param string  $class2
+     * @param string  $text1   String 1.
+     * @param integer $lineno1 String 1 line number.
+     * @param string  $class1  String 1 class.
+     * @param string  $text2   String 2.
+     * @param integer $lineno2 String 2 line number.
+     * @param string  $class2  String 2 class.
      * 
      * @return void
      * 
@@ -110,8 +110,8 @@ class ListingHelper extends XsgaAbstractClass
     /**
      * Add deleted line.
      * 
-     * @param string  $text
-     * @param integer $lineno
+     * @param string  $text   String.
+     * @param integer $lineno Line number.
      * 
      * @return void
      * 
@@ -127,8 +127,8 @@ class ListingHelper extends XsgaAbstractClass
     /**
      * Add added line.
      * 
-     * @param string  $text
-     * @param integer $lineno
+     * @param string  $text   String.
+     * @param integer $lineno Line number.
      * 
      * @return void
      * 
@@ -144,10 +144,10 @@ class ListingHelper extends XsgaAbstractClass
     /**
      * Add changed line.
      * 
-     * @param string  $text1
-     * @param integer $lineno1
-     * @param string  $text2
-     * @param integer $lineno2
+     * @param string  $text1   String 1.
+     * @param integer $lineno1 String 1 line number.
+     * @param string  $text2   String 2.
+     * @param integer $lineno2 String 2 line number.
      * 
      * @return void
      * 
@@ -165,10 +165,10 @@ class ListingHelper extends XsgaAbstractClass
      * 
      * Note that $text1 do not need to be equal $text2 if $ignoreWhitespace is true.
      * 
-     * @param string  $text1
-     * @param integer $lineno1
-     * @param string  $text2
-     * @param integer $lineno2
+     * @param string  $text1   String 1.
+     * @param integer $lineno1 String 1 line number.
+     * @param string  $text2   String 2.
+     * @param integer $lineno2 String 2 line number.
      * 
      * @return void
      * 

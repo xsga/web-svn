@@ -53,7 +53,7 @@ abstract class AbstractController extends XsgaAbstractClass
     /**
      * Render template.
      * 
-     * @param Setup  $setup
+     * @param Setup  $setup        Setup instance.
      * @param string $templateName Template name.
      * 
      * @return void
@@ -73,7 +73,7 @@ abstract class AbstractController extends XsgaAbstractClass
     /**
      * Validates repository.
      * 
-     * @param Setup $setup
+     * @param Setup $setup Setup instance.
      * 
      * @exception XsgaValidationException
      * 
@@ -102,7 +102,7 @@ abstract class AbstractController extends XsgaAbstractClass
     /**
      * Validates access.
      * 
-     * @param Setup $setup
+     * @param Setup $setup Setup instance.
      * 
      * @exception XsgaValidationException
      * 
@@ -131,8 +131,8 @@ abstract class AbstractController extends XsgaAbstractClass
     /**
      * Validates listing.
      *
-     * @param Setup        $setup
-     * @param Repository[] $projects
+     * @param Setup        $setup    Setup instance.
+     * @param Repository[] $projects Repository instances array.
      *
      * @exception XsgaValidationException
      *
@@ -161,7 +161,7 @@ abstract class AbstractController extends XsgaAbstractClass
     /**
      * Validates download.
      *
-     * @param Setup $setup
+     * @param Setup $setup Setup instance.
      *
      * @exception XsgaValidationException
      *

@@ -564,6 +564,7 @@ class WebSvnConfig extends XsgaAbstractClass
         // Executes parent constructor.
         parent::__construct();
         
+        // Set tmp path.
         $tmpPath  = realpath(dirname(__FILE__));
         $tmpPath .= DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
         $tmpPath .= 'tmp';
@@ -598,13 +599,13 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Add repository subpath.
      * 
-     * @param string $name
-     * @param string $serverRootURL
-     * @param string $subpath
-     * @param string $group
-     * @param string $username
-     * @param string $password
-     * @param string $clientRootURL
+     * @param string $name          Repository name.
+     * @param string $serverRootURL Server root URL.
+     * @param string $subpath       Subpath.
+     * @param string $group         Group.
+     * @param string $username      Username.
+     * @param string $password      Password.
+     * @param string $clientRootURL Client root URL.
      * 
      * @return void
      * 
@@ -861,7 +862,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Specify MIME types to display inline in WebSVN pages.
      * 
-     * @param unknown $type
+     * @param string $type Type.
      * 
      * @return void
      * 
@@ -880,13 +881,13 @@ class WebSvnConfig extends XsgaAbstractClass
      * Set logs show changes.
      * 
      * @param boolean $enabled Enabled flag.
-     * @param number  $myrep
+     * @param string  $myrep   Repository name.
      * 
      * @return void
      * 
      * @access public
      */
-    public function setLogsShowChanges($enabled = true, $myrep = 0)
+    public function setLogsShowChanges($enabled = true, $myrep = '0')
     {
         if (empty($myrep)) {
             $this->logsShowChanges = $enabled;
@@ -915,13 +916,13 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Allow download.
      * 
-     * @param number $myrep
+     * @param string $myrep Repository name.
      * 
      * @return void
      * 
      * @access public
      */
-    public function allowDownload($myrep = 0)
+    public function allowDownload($myrep = '0')
     {
         if (empty($myrep)) {
             $this->allowDownload = true;
@@ -936,13 +937,13 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Disallow download.
      * 
-     * @param number $myrep
+     * @param string $myrep Repository name.
      * 
      * @return void
      * 
      * @access public
      */
-    public function disallowDownload($myrep = 0)
+    public function disallowDownload($myrep = '0')
     {
         if (empty($myrep)) {
             $this->allowDownload = false;
@@ -1005,14 +1006,14 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Set min download level.
      * 
-     * @param integer $level
-     * @param number  $myrep
+     * @param integer $level Level.
+     * @param string  $myrep Repository name.
      * 
      * @return void
      * 
      * @access public
      */
-    public function setMinDownloadLevel($level, $myrep = 0)
+    public function setMinDownloadLevel($level, $myrep = '0')
     {
         if (empty($myrep)) {
             $this->minDownloadLevel = $level;
@@ -1041,14 +1042,14 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Add allowed download exceptions.
      * 
-     * @param string $path
-     * @param number $myrep
+     * @param string $path  Path.
+     * @param string $myrep Repository name.
      * 
      * @return void
      * 
      * @access public
      */
-    public function addAllowedDownloadException($path, $myrep = 0)
+    public function addAllowedDownloadException($path, $myrep = '0')
     {
         if ($path[strlen($path) - 1] !== '/') {
             $path .= '/';
@@ -1067,14 +1068,14 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Add disallowed download exceptions.
      * 
-     * @param unknown $path
-     * @param number $myrep
+     * @param string $path  Path.
+     * @param string $myrep Repository name.
      * 
      * @return void
      * 
      * @access public
      */
-    public function addDisallowedDownloadException($path, $myrep = 0)
+    public function addDisallowedDownloadException($path, $myrep = '0')
     {
         if ($path[trlen($path) - 1] !== '/') {
             $path .= '/';
@@ -1103,7 +1104,7 @@ class WebSvnConfig extends XsgaAbstractClass
     public function findException($path, $exceptions)
     {
         foreach ($exceptions as $exc) {
-            if (strncmp($exc, $path, strlen($exc)) == 0) {
+            if (strncmp($exc, $path, strlen($exc)) === 0) {
                 return true;
             }//end if
         }//end foreach
@@ -1116,9 +1117,9 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Get the URL to a path name based on the current config.
      * 
-     * @param Repository|string $rep
-     * @param string            $path
-     * @param string            $op
+     * @param Repository|string $rep  Repository instance or name.
+     * @param string            $path Path.
+     * @param string            $op   Options.
      * 
      * @return string
      * 
@@ -1142,9 +1143,9 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Get the URL and parameters for a path name based on the current config.
      * 
-     * @param Repository|string $rep
-     * @param string            $path
-     * @param string            $op
+     * @param Repository|string $rep  Repository instance or name.
+     * @param string            $path Path.
+     * @param string            $op   Options.
      * 
      * @return array
      * 
@@ -1218,10 +1219,10 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Set the location of the given path.
      * 
-     * @param string $var
-     * @param string $path
-     * @param string $name
-     * @param string $params
+     * @param string $var    Var.
+     * @param string $path   Path.
+     * @param string $name   Name.
+     * @param string $params Params.
      * 
      * @return void
      * 
@@ -1275,7 +1276,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Define directory path to use for --config-dir parameter.
      * 
-     * @param unknown $path
+     * @param string $path Path.
      * 
      * @return void
      * 
@@ -1307,7 +1308,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Define the location of the svn command (e.g. '/usr/bin').
      * 
-     * @param string $path
+     * @param string $path Path.
      * 
      * @return void
      * 
@@ -1324,7 +1325,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Define a prefix to include before every SVN command (e.g. 'arch -i386').
      * 
-     * @param string $prefix
+     * @param string $prefix Prefix.
      * 
      * @return void
      * 
@@ -1416,7 +1417,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Define the location of the enscript command.
      * 
-     * @param string $path
+     * @param string $path Path.
      * 
      * @return void
      * 
@@ -1446,7 +1447,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Define the location of the sed command.
      * 
-     * @param string $path
+     * @param string $path Path.
      * 
      * @return void
      * 
@@ -1476,7 +1477,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Define the location of the tar command.
      * 
-     * @param string $path
+     * @param string $path Path.
      * 
      * @return void
      * 
@@ -1506,7 +1507,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Define the location of the GZip command.
      * 
-     * @param string $path
+     * @param string $path Path.
      * 
      * @return void
      * 
@@ -1536,7 +1537,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Define the location of the zip command.
      * 
-     * @param string $path
+     * @param string $path Path.
      * 
      * @return void
      * 
@@ -1566,7 +1567,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Define the default file download mode - one of [gzip, zip, plain].
      * 
-     * @param string $dlmode
+     * @param string $dlmode Download mode.
      * 
      * @return void
      * 
@@ -1649,7 +1650,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Add template path.
      * 
-     * @param string $path
+     * @param string $path Path.
      * 
      * @return void
      * 
@@ -1673,8 +1674,8 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Set template path.
      * 
-     * @param string $path
-     * @param string $myrep
+     * @param string $path  Path.
+     * @param string $myrep Repository name.
      * 
      * @return void
      * 
@@ -1872,11 +1873,11 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Set bugtraq properties.
      * 
-     * @param string  $message
-     * @param string  $logregex
-     * @param string  $url
-     * @param boolean $append
-     * @param string  $myrep
+     * @param string  $message  Message.
+     * @param string  $logregex Regular expression.
+     * @param string  $url      URL.
+     * @param boolean $append   Append flag.
+     * @param string  $myrep    Repository name.
      * 
      * @return void
      * 
@@ -1974,8 +1975,8 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Use authentication file.
      * 
-     * @param string $file
-     * @param string $myrep
+     * @param string $file  File.
+     * @param string $myrep Repository name.
      * 
      * @return void
      * 
@@ -2102,7 +2103,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Use tree index.
      * 
-     * @param boolean $open
+     * @param boolean $open Open flag.
      * 
      * @return void
      * 
@@ -2147,7 +2148,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Set alphabetic order.
      * 
-     * @param boolean $flag
+     * @param boolean $flag Flag.
      * 
      * @return void
      * 
@@ -2191,7 +2192,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Set show last modification in index.
      * 
-     * @param boolean $show
+     * @param boolean $show Show flag.
      * 
      * @return void
      * 
@@ -2221,7 +2222,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Set show last modification in listing.
      * 
-     * @param boolean $show
+     * @param boolean $show Show flag.
      * 
      * @return void
      * 
@@ -2251,7 +2252,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Set show age instead of date.
      * 
-     * @param boolean $show
+     * @param boolean $show Show flag.
      * 
      * @return void
      * 
@@ -2281,7 +2282,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Set ignore whitespaces in diff.
      * 
-     * @param boolean $ignore
+     * @param boolean $ignore Ignore flag.
      * 
      * @return void
      * 
@@ -2297,7 +2298,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Set subversion version.
      * 
-     * @param string $subversionVersion
+     * @param string $subversionVersion SVN version.
      * 
      * @return void
      * 
@@ -2327,7 +2328,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Set subversion major version.
      * 
-     * @param string $subversionMajorVersion
+     * @param string $subversionMajorVersion SVN major version.
      * 
      * @return void
      * 
@@ -2356,7 +2357,7 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Set subversion minor version.
      * 
-     * @param string $subversionMinorVersion
+     * @param string $subversionMinorVersion SVN minor version.
      * 
      * @access public
      */
@@ -2409,14 +2410,14 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Merge sort.
      * 
-     * @param array  $array
-     * @param string $cmp_function
+     * @param array  $array       Array.
+     * @param string $cmpFunction Compare function.
      * 
      * @return void
      * 
      * @access public
      */
-    public function mergesort(&$array, $cmp_function = 'strcmp')
+    public function mergesort(&$array, $cmpFunction = 'strcmp')
     {
         // Arrays of size < 2 require no action.
         if (count($array) < 2) {
@@ -2429,11 +2430,11 @@ class WebSvnConfig extends XsgaAbstractClass
         $array2  = array_slice($array, $halfway);
         
         // Recurse to sort the two halves.
-        $this->mergesort($array1, $cmp_function);
-        $this->mergesort($array2, $cmp_function);
+        $this->mergesort($array1, $cmpFunction);
+        $this->mergesort($array2, $cmpFunction);
         
         // If all of $array1 is <= all of $array2, just append them.
-        if (call_user_func($cmp_function, end($array1), $array2[0]) < 1) {
+        if (call_user_func($cmpFunction, end($array1), $array2[0]) < 1) {
             $array = array_merge($array1, $array2);
             return;
         }//end if
@@ -2447,7 +2448,7 @@ class WebSvnConfig extends XsgaAbstractClass
         $ptr2 = 0;
         
         while ($ptr1 < $array1count && $ptr2 < $array2count) {
-            if (call_user_func($cmp_function, $array1[$ptr1], $array2[$ptr2]) < 1) {
+            if (call_user_func($cmpFunction, $array1[$ptr1], $array2[$ptr2]) < 1) {
                 $array[] = $array1[$ptr1++];
             } else {
                 $array[] = $array2[$ptr2++];
@@ -2469,8 +2470,8 @@ class WebSvnConfig extends XsgaAbstractClass
     /**
      * Compare groups.
      * 
-     * @param Repository $a
-     * @param Repository $b
+     * @param Repository $a Repository instance.
+     * @param Repository $b Repository instance.
      *
      * @return number
      * 

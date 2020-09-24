@@ -424,7 +424,7 @@ class Setup extends XsgaAbstractClass
     /**
      * Load language literals.
      * 
-     * @param string $language
+     * @param string $language Language.
      * 
      * @return array
      * 
@@ -631,10 +631,10 @@ class Setup extends XsgaAbstractClass
     /**
      * Function to create the revision selection HTML form.
      * 
-     * @param Repository $rep
-     * @param string     $path
-     * @param string     $rev
-     * @param string     $peg
+     * @param Repository $rep  Repository instance.
+     * @param string     $path Path.
+     * @param string     $rev  Revision.
+     * @param string     $peg  Peg.
      * 
      * @return void
      * 

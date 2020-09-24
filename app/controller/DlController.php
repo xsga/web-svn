@@ -53,7 +53,7 @@ class DlController extends AbstractController
     /**
      * Constructor.
      * 
-     * @param Setup $setup
+     * @param Setup $setup Setup instance.
      * 
      * @throws XsgaFileNotFoundException
      * @throws XsgaException

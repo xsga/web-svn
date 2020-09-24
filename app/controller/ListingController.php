@@ -51,7 +51,7 @@ class ListingController extends AbstractController
     /**
      * Constructor.
      * 
-     * @param Setup $setup
+     * @param Setup $setup Setup instance.
      * 
      * @access public
      */

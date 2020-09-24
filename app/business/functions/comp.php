@@ -61,9 +61,9 @@ function checkRevision($rev)
 /**
  * Clear vars.
  * 
- * @param boolean $ignoreWhitespace
- * @param Setup   $setup
- * @param integer $index
+ * @param boolean $ignoreWhitespace Ignore whitespace flag.
+ * @param Setup   $setup            Setup instance.
+ * @param integer $index            Index.
  * 
  * @return void
  */

@@ -102,6 +102,7 @@ class Template extends XsgaAbstractClass
      */
     public function __construct(Setup $setup)
     {
+        // Executes parent construct.
         parent::__construct();
         
         $this->setup = $setup;
@@ -112,8 +113,8 @@ class Template extends XsgaAbstractClass
     /**
      * Parse command.
      * 
-     * @param integer $line
-     * @param string $handle
+     * @param integer $line   Line.
+     * @param string  $handle Handle.
      * 
      * @return boolean
      * 
@@ -275,7 +276,7 @@ class Template extends XsgaAbstractClass
     /**
      * Parse template.
      * 
-     * @param string $file
+     * @param string $file File.
      * 
      * @return void
      * 
@@ -336,7 +337,7 @@ class Template extends XsgaAbstractClass
                 
             } else if ($this->parseCommand($line, $handle)) {
                 
-                continue;
+                assert(true);
                 
             } else {
                 
@@ -361,7 +362,7 @@ class Template extends XsgaAbstractClass
     /**
      * Parse tags.
      * 
-     * @param string $line
+     * @param string $line Line.
      * 
      * @return string
      * 
@@ -411,7 +412,7 @@ class Template extends XsgaAbstractClass
     /**
      * Render template.
      * 
-     * @param string $view
+     * @param string $view View.
      * 
      * @return void
      * 
@@ -452,7 +453,9 @@ class Template extends XsgaAbstractClass
     /**
      * Execute plain PHP template.
      * 
-     * @param unknown $vars
+     * @return void
+     * 
+     * @access public
      */
     public function executePlainPhpTemplate()
     {

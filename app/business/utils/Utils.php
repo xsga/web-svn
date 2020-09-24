@@ -52,7 +52,7 @@ class Utils extends XsgaAbstractClass
     /**
      * Create path links.
      * 
-     * @param Setup  $config Setup.
+     * @param Setup  $config Setup instance.
      * @param string $path   Path.
      * 
      * @return string
@@ -107,8 +107,8 @@ class Utils extends XsgaAbstractClass
     /**
      * Create rev and peg string.
      * 
-     * @param integer $rev
-     * @param integer $peg
+     * @param integer $rev Revision.
+     * @param integer $peg Peg.
      * 
      * @return string
      * 
@@ -134,8 +134,8 @@ class Utils extends XsgaAbstractClass
     /**
      * Create different rev and peg string.
      * 
-     * @param integer $rev
-     * @param integer $peg
+     * @param integer $rev Revision.
+     * @param integer $peg Peg.
      * 
      * @return string
      * 
@@ -161,8 +161,8 @@ class Utils extends XsgaAbstractClass
     /**
      * Anchor for path.
      * 
-     * @param string  $path
-     * @param boolean $treeView
+     * @param string  $path     Path.
+     * @param boolean $treeView Tree view flag.
      * 
      * @return string
      * 
@@ -185,7 +185,7 @@ class Utils extends XsgaAbstractClass
     /**
      * Create anchor.
      * 
-     * @param string $text
+     * @param string $text Text.
      * 
      * @return string|array
      * 
@@ -218,7 +218,7 @@ class Utils extends XsgaAbstractClass
     /**
      * Get full URL.
      * 
-     * @param string $loc
+     * @param string $loc Location.
      * 
      * @return string
      * 
@@ -273,7 +273,7 @@ class Utils extends XsgaAbstractClass
     /**
      * XML entities.
      * 
-     * @param string $str
+     * @param string $str String.
      * 
      * @return array
      * 
@@ -298,8 +298,8 @@ class Utils extends XsgaAbstractClass
     /**
      * Hardspace.
      * 
-     * @param string     $s
-     * @param Repositori $rep
+     * @param string     $s   String.
+     * @param Repository $rep Repository instance.
      * 
      * @return string
      * 
@@ -315,8 +315,8 @@ class Utils extends XsgaAbstractClass
     /**
      * Wrap in code tag if it's necessary.
      * 
-     * @param string $string
-     * @param string $geshi
+     * @param string $string String.
+     * @param string $geshi  Geshi.
      * 
      * @return string
      */
@@ -462,7 +462,7 @@ class Utils extends XsgaAbstractClass
     /**
      * Parse SVN timestamp.
      * 
-     * @param string $dateString
+     * @param string $dateString String date.
      * 
      * @return number
      * 
@@ -501,9 +501,9 @@ class Utils extends XsgaAbstractClass
     /**
      * Query builder.
      * 
-     * @param object $data
-     * @param string $separator
-     * @param string $key
+     * @param object $data      Data.
+     * @param string $separator Separator.
+     * @param string $key       Key.
      * 
      * @return string
      * 
@@ -541,10 +541,10 @@ class Utils extends XsgaAbstractClass
     /**
      * Get username.
      * 
-     * @param array   $languages
-     * @param string  $default
-     * @param string  $userchoice
-     * @param boolean $useAcceptedLanguages
+     * @param array   $languages            Language.
+     * @param string  $default              Default language.
+     * @param string  $userchoice           User choice
+     * @param boolean $useAcceptedLanguages Use accepted languages flag.
      * 
      * @return string
      * 
@@ -619,8 +619,8 @@ class Utils extends XsgaAbstractClass
     /**
      * TempnamWithCheck.
      * 
-     * @param string $dir
-     * @param string $prefix
+     * @param string $dir    Directory.
+     * @param string $prefix Prefix.
      * 
      * @return string
      * 

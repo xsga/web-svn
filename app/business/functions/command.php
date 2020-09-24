@@ -93,7 +93,7 @@ function toOutputEncoding($str)
 /**
  * Scape a string to output.
  * 
- * @param string $str
+ * @param string $str String to escape.
  * 
  * @return string|array
  */
@@ -115,8 +115,8 @@ function escape($str)
 /**
  * Execute command.
  * 
- * @param string  $cmd
- * @param integer $retcode
+ * @param string  $cmd     Command to execute.
+ * @param integer $retcode Returned code.
  * 
  * @return unknown
  */
@@ -159,9 +159,9 @@ function passthruCommand($cmd)
 /**
  * Run command.
  * 
- * @param string  $cmd
- * @param boolean $mayReturnNothing
- * @param string  $errorIf
+ * @param string  $cmd              Command.
+ * @param boolean $mayReturnNothing Return nothing flag.
+ * @param string  $errorIf          Error.
  * 
  * @return string[]
  */
@@ -271,7 +271,7 @@ function stripCredentialsFromCommand($cmd)
 /**
  * Quote a string to send to the command line.
  * 
- * @param string $str
+ * @param string $str String.
  * 
  * @return string
  */

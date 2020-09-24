@@ -46,8 +46,8 @@ interface LineDiffInterface
      * 
      * Similarity 1 means that strings are very close to each other 0 means totally different.
      * 
-     * @param string $text1
-     * @param string $text2
+     * @param string $text1 String 1.
+     * @param string $text2 String 2.
      * 
      * @return boolean
      * 
@@ -61,11 +61,11 @@ interface LineDiffInterface
      * 
      * Return array($left, $right) annotated with <ins> and <del>.
      * 
-     * @param string  $text1
-     * @param string  $highlighted1
-     * @param string  $text2
-     * @param string  $highlighted2
-     * @param boolean $highlighted
+     * @param string  $text1        String 1.
+     * @param string  $highlighted1 String 1 highlighted.
+     * @param string  $text2        String 2.
+     * @param string  $highlighted2 String 2 highlighted.
+     * @param boolean $highlighted  Highlighted flag.
      * 
      * @return array
      * 

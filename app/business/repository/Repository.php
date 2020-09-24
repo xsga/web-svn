@@ -240,22 +240,24 @@ class Repository extends XsgaAbstractClass
     /**
      * Constructor.
      *
-     * @param WebSvnConfig $config
-     * @param string       $name
-     * @param string       $svnName
-     * @param string       $serverRootURL
-     * @param string       $group
-     * @param string       $username
-     * @param string       $password
-     * @param string       $subpath
-     * @param string       $clientRootURL
+     * @param WebSvnConfig $config        WebSvnConfig instance.
+     * @param string       $name          Name.
+     * @param string       $svnName       SVN name.
+     * @param string       $serverRootURL Server root URL.
+     * @param string       $group         Group.
+     * @param string       $username      Username.
+     * @param string       $password      Password.
+     * @param string       $subpath       Subpath.
+     * @param string       $clientRootURL Client root URL.
      *
      * @return void
      */
     public function __construct(WebSvnConfig $config, $name, $svnName, $serverRootURL, $group = null, $username = null, $password = null, $subpath = null, $clientRootURL = null)
     {
+        // Executes parent construct.
         parent::__construct();
         
+        // Set attributes.
         $this->name          = $name;
         $this->svnName       = $svnName;
         $this->path          = $serverRootURL;
@@ -330,7 +332,7 @@ class Repository extends XsgaAbstractClass
     /**
      * Log show changes.
      * 
-     * @param boolean $showChangess
+     * @param boolean $showChangess Show changes flag.
      * 
      * @return boolean
      * 
@@ -762,7 +764,7 @@ class Repository extends XsgaAbstractClass
     /**
      * Use authentication file.
      * 
-     * @param string  $file Filename.
+     * @param string $file Filename.
      * 
      * @return void
      * 
@@ -820,7 +822,7 @@ class Repository extends XsgaAbstractClass
     /**
      * Get path.
      * 
-     * @param string $path
+     * @param string $path Path.
      * 
      * @return string
      * 
@@ -892,7 +894,7 @@ class Repository extends XsgaAbstractClass
     /**
      * Has unrestricted read access.
      * 
-     * @param string $pathWoSub
+     * @param string $pathWoSub Path.
      * 
      * @return boolean
      * 

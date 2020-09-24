@@ -77,12 +77,13 @@ class SensibleLineChanges extends XsgaAbstractClass
     /**
      * Constructor.
      * 
-     * @param LineDiff $lineDiff
+     * @param LineDiff $lineDiff LineDiff instance.
      * 
      * @access public
      */
     public function __construct(LineDiff $lineDiff)
     {
+        // Executes parent construct.
         parent::__construct();
         
         $this->_lineDiff = $lineDiff;
@@ -93,9 +94,9 @@ class SensibleLineChanges extends XsgaAbstractClass
     /**
      * Add deleted line.
      * 
-     * @param string  $text
-     * @param string  $highlighted_text
-     * @param integer $lineno
+     * @param string  $text             String.
+     * @param string  $highlighted_text String highlighted.
+     * @param integer $lineno           String line number.
      * 
      * @return void
      * 
@@ -111,9 +112,9 @@ class SensibleLineChanges extends XsgaAbstractClass
     /**
      * Add added line.
      * 
-     * @param string  $text
-     * @param string  $highlighted_text
-     * @param integer $lineno
+     * @param string  $text             String.
+     * @param string  $highlighted_text String highlighted.
+     * @param integer $lineno           String line number.
      * 
      * @return void
      * 
@@ -273,8 +274,8 @@ class SensibleLineChanges extends XsgaAbstractClass
     /**
      * Add computed changes to the listing.
      * 
-     * @param ListingHelper $listingHelper
-     * @param boolean       $highlighted
+     * @param ListingHelper $listingHelper ListingHelper instance.
+     * @param boolean       $highlighted   Highlighted flag.
      * 
      * @return void
      * 

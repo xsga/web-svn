@@ -52,7 +52,7 @@ class FiledetailsController extends AbstractController
     /**
      * Constructor.
      * 
-     * @param Setup $setup
+     * @param Setup $setup Setup instance.
      * 
      * @access public
      */
@@ -224,9 +224,9 @@ class FiledetailsController extends AbstractController
     /**
      * Get zipped.
      * 
-     * @param Setup  $setup
-     * @param SVNLog $history
-     * @param string $extn
+     * @param Setup  $setup   Setup instance.
+     * @param SVNLog $history SVNLog instance.
+     * @param string $extn    Extension.
      * 
      * @return void
      * 
@@ -259,7 +259,7 @@ class FiledetailsController extends AbstractController
     /**
      * Validates file exists.
      * 
-     * @param Setup $setup
+     * @param Setup $setup Setup instance.
      * 
      * @throws XsgaFileNotFoundException
      * 

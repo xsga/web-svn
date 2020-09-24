@@ -103,6 +103,7 @@ class SVNRepository extends XsgaAbstractClass
      */
     public function __construct(Setup $setup)
     {
+        // Executes parent construct.
         parent::__construct();
         
         $this->repConfig = $setup->rep;
@@ -118,8 +119,8 @@ class SVNRepository extends XsgaAbstractClass
      * (when invoking on the first line, $attributes should be an empty array).
      * Invoked to make sure all open syntax highlighting tags (<font>, <i>, <b>, etc.).
      * 
-     * @param string  $line
-     * @param array   $attributes
+     * @param string $line       Line.
+     * @param array  $attributes Attributes.
      * 
      * @return mixed
      * 
@@ -178,10 +179,10 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Private function to simplify creation of common SVN command string text.
      * 
-     * @param string  $command
-     * @param string  $path
-     * @param integer $rev
-     * @param string  $peg
+     * @param string  $command Command.
+     * @param string  $path    Path.
+     * @param integer $rev     Revision.
+     * @param string  $peg     Peg.
      * 
      * @return string
      * 
@@ -197,7 +198,7 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Private function to simplify creation of enscript command string text.
      * 
-     * @param string $path
+     * @param string $path Path.
      * 
      * @return string
      * 
@@ -233,12 +234,12 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Dump the content of a file to the given filename.
      * 
-     * @param string $path
-     * @param string $filename
-     * @param number $rev
-     * @param string $peg
-     * @param string $pipe
-     * @param string $highlight
+     * @param string $path      Path.
+     * @param string $filename  Filename.
+     * @param number $rev       Revision.
+     * @param string $peg       Peg.
+     * @param string $pipe      Pipe.
+     * @param string $highlight Highlight.
      * 
      * @return boolean
      * 
@@ -341,7 +342,7 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Check if geshi can highlight the given extension and return the language.
      * 
-     * @param string $path
+     * @param string $path Path.
      * 
      * @return string
      * 
@@ -384,12 +385,12 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Perform syntax highlighting using geshi.
      * 
-     * @param string $path
-     * @param string $filename
-     * @param string $language
-     * @param string $rev
-     * @param string $peg
-     * @param string $return
+     * @param string $path     Path.
+     * @param string $filename Filename.
+     * @param string $language Language.
+     * @param string $rev      Revision.
+     * @param string $peg      Peg.
+     * @param string $return   Return.
      * 
      * @return void
      * 
@@ -435,9 +436,9 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Print the contents of a file without filling up Apache's memory.
      * 
-     * @param unknown $path
-     * @param number $rev
-     * @param string $peg
+     * @param string $path Path.
+     * @param number $rev  Revision.
+     * @param string $peg  Peg.
      * 
      * @return void
      * 
@@ -509,10 +510,10 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Dump the blame content of a file to the given filename.
      * 
-     * @param string $path
-     * @param string $filename
-     * @param number $rev
-     * @param string $peg
+     * @param string $path     Path.
+     * @param string $filename Filename.
+     * @param number $rev      Revision.
+     * @param string $peg      Peg.
      * 
      * @return void
      * 
@@ -537,10 +538,10 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * XML parse CMD output.
      * 
-     * @param string   $cmd
-     * @param callable $startElem
-     * @param callable $endElem
-     * @param callable $charData
+     * @param string   $cmd       Command.
+     * @param callable $startElem Start element callable.
+     * @param callable $endElem   End element callable.
+     * @param callable $charData  Character data callable.
      * 
      * @return void
      * 
@@ -610,9 +611,9 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Get properties.
      * 
-     * @param string $path
-     * @param number $rev
-     * @param string $peg
+     * @param string $path Path.
+     * @param number $rev  Revision.
+     * @param string $peg  Peg.
      * 
      * @return string[]
      * 
@@ -641,10 +642,10 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Get property.
      * 
-     * @param string $path
-     * @param string $property
-     * @param number $rev
-     * @param string $peg
+     * @param string $path     Path.
+     * @param string $property Property.
+     * @param number $rev      Revision.
+     * @param string $peg      Peg.
      * 
      * @return string
      * 
@@ -669,10 +670,10 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Exports the directory to the given location.
      * 
-     * @param string $path
-     * @param string $filename
-     * @param number $rev
-     * @param string $peg
+     * @param string $path     Path.
+     * @param string $filename Filename.
+     * @param number $rev      Revision.
+     * @param string $peg      Peg.
      * 
      * @return number
      * 
@@ -698,9 +699,9 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Get info.
      * 
-     * @param string $path
-     * @param number $rev
-     * @param string $peg
+     * @param string $path Path.
+     * @param number $rev  Revision.
+     * @param string $peg  Peg.
      * 
      * @return NULL|SVNInfoEntry
      * 
@@ -747,9 +748,9 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Get list.
      * 
-     * @param string $path
-     * @param number $rev
-     * @param string $peg
+     * @param string $path Path.
+     * @param number $rev  Revision.
+     * @param string $peg  Peg.
      * 
      * @return SVNList
      * 
@@ -791,13 +792,13 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Get log.
      * 
-     * @param string  $path
-     * @param string  $brev
-     * @param number  $erev
-     * @param boolean $quiet
-     * @param number  $limit
-     * @param string  $peg
-     * @param boolean $verbose
+     * @param string  $path    Path.
+     * @param string  $brev    Revision.
+     * @param number  $erev    Revision.
+     * @param boolean $quiet   Quiet flag.
+     * @param number  $limit   Limit.
+     * @param string  $peg     Peg.
+     * @param boolean $verbose Verbose flag.
      * 
      * @return SVNLog
      * 
@@ -913,9 +914,9 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Is file.
      * 
-     * @param string $path
-     * @param number $rev
-     * @param string $peg
+     * @param string $path Path.
+     * @param number $rev  Revision.
+     * @param string $peg  Peg.
      * 
      * @return boolean
      * 
@@ -934,7 +935,7 @@ class SVNRepository extends XsgaAbstractClass
     /**
      * Get SVN path.
      * 
-     * @param string $path
+     * @param string $path Path.
      * 
      * @return string
      * 

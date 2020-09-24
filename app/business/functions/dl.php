@@ -31,8 +31,8 @@
 /**
  * Set directory timestamp.
  * 
- * @param string  $dir
- * @param integer $timestamp
+ * @param string  $dir       Directory.
+ * @param integer $timestamp Timestamp.
  * 
  * @return void
  */
@@ -74,7 +74,7 @@ function setDirectoryTimestamp($dir, $timestamp)
 /**
  * Remove directory.
  * 
- * @param string $dir
+ * @param string $dir Directory.
  * 
  * @return boolean
  */

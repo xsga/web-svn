@@ -104,18 +104,26 @@ class ParentPath extends XsgaAbstractClass
     /**
      * Constructor.
      * 
+     * @param WebSvnConfig   $config           WebSvnConfig instance.
+     * @param string         $path             Path.
+     * @param string         $group            Group.
+     * @param strinf|boolean $pattern          Pattern or flag.
+     * @param boolean        $skipAlreadyAdded Skip already added flag.
+     * @param string         $clientRootURL    Client root URL.
+     * 
      * @access public
      */
-    public function __construct($config, $path, $group = null, $pattern = false, $skipAlreadyAdded = true, $clientRootURL = '')
+    public function __construct(WebSvnConfig $config, $path, $group = null, $pattern = false, $skipAlreadyAdded = true, $clientRootURL = '')
     {
+        // Executes parent construct.
         parent::__construct();
         
-        $this->path = $path;
-        $this->group = $group;
-        $this->pattern = $pattern;
+        $this->path             = $path;
+        $this->group            = $group;
+        $this->pattern          = $pattern;
         $this->skipAlreadyAdded = $skipAlreadyAdded;
-        $this->clientRootURL = rtrim($clientRootURL, '/');
-        $this->config = $config;
+        $this->clientRootURL    = rtrim($clientRootURL, '/');
+        $this->config           = $config;
         
     }//end __construct()
     
@@ -161,9 +169,8 @@ class ParentPath extends XsgaAbstractClass
                 }//end if
                 
                 if (!in_array($url, $this->config->_excluded, true)) {
-                    $clientRootURL = ($this->clientRootURL) ? $this->clientRootURL.'/'.$name : '';
-                    $rep = new Repository($this->config, $name, $name, $url, $this->group, null, null, null, $clientRootURL);
-                    return $rep;
+                    $clientRootURLVar = ($this->clientRootURL) ? $this->clientRootURL.'/'.$name : '';
+                    return new Repository($this->config, $name, $name, $url, $this->group, null, null, null, $clientRootURLVar);
                 }//end if
                 
             }//end if

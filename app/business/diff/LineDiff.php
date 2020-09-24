@@ -59,12 +59,13 @@ class LineDiff extends XsgaAbstractClass implements LineDiffInterface
     /**
      * Constructor.
      * 
-     * @param boolean $ignoreWhitespace
+     * @param boolean $ignoreWhitespace Ignore whitespace flag.
      * 
      * @access public
      */
     public function __construct($ignoreWhitespace)
     {
+        // Executes parent construct.
         parent::__construct();
         
         $this->ignoreWhitespace = $ignoreWhitespace;
@@ -142,9 +143,9 @@ class LineDiff extends XsgaAbstractClass implements LineDiffInterface
      * Note that separators are returned as tokens of length 1 and if $ignoreWhitespace is true,
      * consecutive whitespaces are returned as one token.
      * 
-     * @param string  $string
-     * @param boolean $highlighted
-     * @param boolean $ignoreWhitespace
+     * @param string  $string           String to parse.
+     * @param boolean $highlighted      Highlighted flag.
+     * @param boolean $ignoreWhitespace Ignore whitespace flag.
      * 
      * @return array
      */

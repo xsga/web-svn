@@ -100,6 +100,7 @@ class SVNLook extends XsgaAbstractClass
      */
     public function __construct(Setup $setup)
     {
+        // Executes parent construct.
         parent::__construct();
         
         $this->setup = $setup;
@@ -110,8 +111,8 @@ class SVNLook extends XsgaAbstractClass
     /**
      * SVN log entry.
      * 
-     * @param SVNLogEntry $a
-     * @param SVNLogEntry $b
+     * @param SVNLogEntry $a SVNLogEntry instance.
+     * @param SVNLogEntry $b SVNLogEntry instance.
      * 
      * @return number
      * 
@@ -127,9 +128,9 @@ class SVNLook extends XsgaAbstractClass
     /**
      * Info start element.
      * 
-     * @param resource $parser
-     * @param string   $name
-     * @param array    $attrs
+     * @param resource $parser Parser resource.
+     * @param string   $name   Name.
+     * @param array    $attrs  Attributes.
      * 
      * @return void
      * 
@@ -172,8 +173,8 @@ class SVNLook extends XsgaAbstractClass
     /**
      * Info end element.
      * 
-     * @param resource $parser
-     * @param string   $name
+     * @param resource $parser Parser.
+     * @param string   $name   Name.
      * 
      * @return void
      * 
@@ -194,8 +195,8 @@ class SVNLook extends XsgaAbstractClass
     /**
      * Info character data.
      * 
-     * @param resource $parser
-     * @param string   $data
+     * @param resource $parser Parser.
+     * @param string   $data   Data.
      * 
      * @return void
      * 
@@ -220,9 +221,9 @@ class SVNLook extends XsgaAbstractClass
     /**
      * List start element.
      * 
-     * @param resource $parser
-     * @param string   $name
-     * @param array    $attrs
+     * @param resource $parser Parser.
+     * @param string   $name   Name.
+     * @param array    $attrs  Attributes.
      * 
      * @return void
      * 
@@ -282,8 +283,8 @@ class SVNLook extends XsgaAbstractClass
     /**
      * List character data.
      * 
-     * @param resource $parser
-     * @param string   $data
+     * @param resource $parser Parser.
+     * @param string   $data   Data.
      * 
      * @return void
      * 
@@ -343,8 +344,8 @@ class SVNLook extends XsgaAbstractClass
     /**
      * List end element.
      * 
-     * @param resource $parser
-     * @param string   $name
+     * @param resource $parser Parser.
+     * @param string   $name   Name.
      * 
      * @return void
      * 
@@ -372,9 +373,9 @@ class SVNLook extends XsgaAbstractClass
     /**
      * Log start element.
      * 
-     * @param resource $parser
-     * @param string   $name
-     * @param array    $attrs
+     * @param resource $parser Parser.
+     * @param string   $name   Name.
+     * @param array    $attrs  Attributes.
      * 
      * @return void
      * 
@@ -450,8 +451,12 @@ class SVNLook extends XsgaAbstractClass
     /**
      * Log end element.
      * 
-     * @param resource $parser
-     * @param string   $name
+     * @param resource $parser Parser.
+     * @param string   $name   Name.
+     * 
+     * @return void
+     * 
+     * @access public
      */
     public function logEndElement($parser, $name)
     {
@@ -512,8 +517,8 @@ class SVNLook extends XsgaAbstractClass
     /**
      * Log character data.
      * 
-     * @param resource $parser
-     * @param string   $data
+     * @param resource $parser Parser.
+     * @param string   $data   Data.
      * 
      * @return void
      * 
@@ -583,7 +588,7 @@ class SVNLook extends XsgaAbstractClass
     /**
      * Top level.
      * 
-     * @param string $entry
+     * @param string $entry Entry.
      * 
      * @return boolean
      * 
@@ -601,8 +606,8 @@ class SVNLook extends XsgaAbstractClass
      * Function to sort two given directory entries.
      * Directories go at the top if config option alphabetic is not set.
      * 
-     * @param SVNListEntry $e1
-     * @param SVNListEntry $e2
+     * @param SVNListEntry $e1 SVNListEntry instance.
+     * @param SVNListEntry $e2 SVNListEntry instance.
      * 
      * @return number
      * 
@@ -645,7 +650,7 @@ class SVNLook extends XsgaAbstractClass
     /**
      * Encode path.
      * 
-     * @param string $uri
+     * @param string $uri URI.
      * 
      * @return string
      * 
@@ -693,8 +698,8 @@ class SVNLook extends XsgaAbstractClass
     /**
      * Equal part.
      * 
-     * @param string $str1
-     * @param string $str2
+     * @param string $str1 String 1.
+     * @param string $str2 String 2.
      * 
      * @return string
      * 

@@ -37,7 +37,7 @@ use app\business\setup\WebSvnCons;
 /**
  * Remove URL separator.
  * 
- * @param string $url
+ * @param string $url URL.
  *
  * @return string
  */
@@ -51,8 +51,8 @@ function removeURLSeparator($url)
 /**
  * URL for path.
  * 
- * @param string $fullpath
- * @param Setup  $setup
+ * @param string $fullpath Full path.
+ * @param Setup  $setup    Setup instance.
  * 
  * @return string
  */
@@ -88,11 +88,11 @@ function urlForPath($fullpath, Setup $setup)
 /**
  * Show directory files.
  * 
- * @param array   $subs
- * @param integer $level
- * @param integer $limit
- * @param integer $index
- * @param Setup   $setup
+ * @param array   $subs  Subs.
+ * @param integer $level Level.
+ * @param integer $limit Limit.
+ * @param integer $index Index.
+ * @param Setup   $setup Setup instance.
  *
  * @return array
  */
