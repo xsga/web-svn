@@ -316,11 +316,14 @@ class Bugtraq extends XsgaAbstractClass
         $logmsg  = '';
         $message = rtrim($message);
         
+        // Set offset.
+        $offset = strrpos($message, "\n");
+        
         if ($this->append) {
             
             // Just compare the last line.
-            if (($offset = strrpos($message, "\n")) !== false) {
-                $logmsg = substr($message, 0, $offset + 1);
+            if ($offset !== false) {
+                $logmsg  = substr($message, 0, $offset + 1);
                 $bugLine = substr($message, $offset + 1);
             } else {
                 $bugLine = $message;
@@ -328,9 +331,9 @@ class Bugtraq extends XsgaAbstractClass
             
         } else {
             
-            if (($offset = strpos($message, "\n")) !== false) {
+            if ($offset !== false) {
                 $bugLine = substr($message, 0, $offset);
-                $logmsg = substr($message, $offset);
+                $logmsg  = substr($message, $offset);
             } else {
                 $bugLine = $message;
             }//end if
@@ -354,7 +357,7 @@ class Bugtraq extends XsgaAbstractClass
             
             while ($pos = strpos($issues, ',')) {
                 
-                $issue    = trim(substr($issues, 0, $pos));
+                $issue  = trim(substr($issues, 0, $pos));
                 $issues = substr($issues, $pos + 1);
                 
                 $line .= $href.str_replace(self::BG_SEARCH, $issue, $this->urlstring).'">'.$issue.'</a>, ';
@@ -374,10 +377,10 @@ class Bugtraq extends XsgaAbstractClass
         // Now replace all other instances of bug IDs that match the regex.
         if ($this->logregex) {
             
-            $message = rtrim($message);
-            $line = '';
-            $lines = explode("\n", $this->logregex);
-            $regex_all = '~'.$lines[0].'~';
+            $message      = rtrim($message);
+            $line         = '';
+            $lines        = explode("\n", $this->logregex);
+            $regex_all    = '~'.$lines[0].'~';
             $regex_single = @$lines[1];
             
             if (empty($regex_single)) {
@@ -390,10 +393,10 @@ class Bugtraq extends XsgaAbstractClass
                     
                     for ($match = 0; $match < $numMatches; $match++) {
                         
-                        $issue = $matches[$match][1][0];
-                        $issueOffset = $matches[$match][1][1];
-                        $issueLink = $href.str_replace(self::BG_SEARCH, $issue, $this->urlstring).'">'.$issue.'</a>';
-                        $message = substr_replace($message, $issueLink, $issueOffset + $addedOffset, strlen($issue));
+                        $issue        = $matches[$match][1][0];
+                        $issueOffset  = $matches[$match][1][1];
+                        $issueLink    = $href.str_replace(self::BG_SEARCH, $issue, $this->urlstring).'">'.$issue.'</a>';
+                        $message      = substr_replace($message, $issueLink, $issueOffset + $addedOffset, strlen($issue));
                         $addedOffset += strlen($issueLink) - strlen($issue);
                         
                     }//end for
@@ -406,19 +409,19 @@ class Bugtraq extends XsgaAbstractClass
                 // number from the multiple match.    e.g. [Ii]ssue #?(\d+)(,? ?#?(\d+))+ and (\d+)
                 while (preg_match($regex_all, $message, $matches, PREG_OFFSET_CAPTURE)) {
                     
-                    $completeMatch = $matches[0][0];
+                    $completeMatch       = $matches[0][0];
                     $completeMatchOffset = $matches[0][1];
-                    $replacement = $completeMatch;
+                    $replacement         = $completeMatch;
                     
                     if ($numMatches = preg_match_all('~'.$regex_single.'~', $replacement, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {
                         
                         $addedOffset = 0;
                         
                         for ($match = 0; $match < $numMatches; $match++) {
-                            $issue = $matches[$match][1][0];
-                            $issueOffset = $matches[$match][1][1];
-                            $issueLink = $href.str_replace(self::BG_SEARCH, $issue, $this->urlstring).'">'.$issue.'</a>';
-                            $replacement = substr_replace($replacement, $issueLink, $issueOffset + $addedOffset, strlen($issue));
+                            $issue        = $matches[$match][1][0];
+                            $issueOffset  = $matches[$match][1][1];
+                            $issueLink    = $href.str_replace(self::BG_SEARCH, $issue, $this->urlstring).'">'.$issue.'</a>';
+                            $replacement  = substr_replace($replacement, $issueLink, $issueOffset + $addedOffset, strlen($issue));
                             $addedOffset += strlen($issueLink) - strlen($issue);
                         }//end for
                         

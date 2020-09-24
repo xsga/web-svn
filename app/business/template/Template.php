@@ -429,7 +429,7 @@ class Template extends XsgaAbstractClass
         
         if (is_readable($path)) {
             $this->setup->vars['templateentrypoint'] = $path;
-            executePlainPhpTemplate();
+            $this->executePlainPhpTemplate();
         } else {
             
             $this->parseTemplate('header.tmpl');

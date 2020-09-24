@@ -84,7 +84,7 @@ class SVNLog extends XsgaAbstractClass
     public function findEntry($rev)
     {
         foreach ($this->entries as $index => $entry) {
-            if ($entry->rev == $rev) {
+            if ($entry->rev === $rev) {
                 return $index;
             }//end if
         }//end foresch

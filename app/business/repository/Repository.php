@@ -851,11 +851,11 @@ class Repository extends XsgaAbstractClass
     public function hasReadAccess($pathWoSub, $checkSubDirs = false)
     {
         
-        $path =  $this->_getPathWithSubIf($pathWoSub);
+        $pathInt =  $this->_getPathWithSubIf($pathWoSub);
         $a    =& $this->getAuthz();
         
         if (!empty($a)) {
-            return $a->hasReadAccess($this->svnName, $path, $checkSubDirs);
+            return $a->hasReadAccess($this->svnName, $pathInt, $checkSubDirs);
         }//end if
         
         // No access file - free access.
@@ -876,14 +876,14 @@ class Repository extends XsgaAbstractClass
     public function hasLogReadAccess($pathWithSub)
     {
         
-        $path =  $pathWithSub;
+        $pathInt=  $pathWithSub;
         $a    =& $this->getAuthz();
         
         if (!empty($a)) {
-            return $a->hasReadAccess($this->svnName, $path, false);
+            return $a->hasReadAccess($this->svnName, $pathInt, false);
         }//end if
         
-        // No access file - free access...
+        // No access file - free access.
         return true;
         
     }//end hasLogReadAccess()
@@ -901,11 +901,11 @@ class Repository extends XsgaAbstractClass
     public function hasUnrestrictedReadAccess($pathWoSub)
     {
         
-        $path =  $this->_getPathWithSubIf($pathWoSub);
+        $pathInt=  $this->_getPathWithSubIf($pathWoSub);
         $a    =& $this->getAuthz();
         
         if (!empty($a)) {
-            return $a->hasUnrestrictedReadAccess($this->svnName, $path);
+            return $a->hasUnrestrictedReadAccess($this->svnName, $pathInt);
         }//end if
         
         // No access file - free access.

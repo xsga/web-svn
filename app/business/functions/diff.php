@@ -35,8 +35,6 @@ use app\business\setup\Setup;
 use app\business\diff\ListingHelper;
 use app\business\diff\SensibleLineChanges;
 use app\business\diff\LineDiff;
-use log4php\Logger;
-use xsgaphp\exceptions\XsgaException;
 use app\business\setup\WebSvnCons;
 
 
@@ -319,9 +317,6 @@ function diff_result($all, $highlighted, $newtname, $oldtname, $obj, $ignoreWhit
 function command_diff($all, $ignoreWhitespace, $highlighted, $newtname, $oldtname, $newhlname, $oldhlname, Setup $setup)
 {
     
-    // Get logger.
-    $logger = Logger::getRootLogger();
-    
     $context = 5;
     
     if ($all) {
@@ -340,8 +335,8 @@ function command_diff($all, $ignoreWhitespace, $highlighted, $newtname, $oldtnam
     $diff = runCommand($cmd);
     
     // Ignore the 3 header lines:
-    $line = array_shift($diff);
-    $line = array_shift($diff);
+    array_shift($diff);
+    array_shift($diff);
     
     $setup->arrayBased = true;
     $setup->fileBased  = false;
@@ -383,7 +378,7 @@ function inline_diff($all, $ignoreWhitespace, $highlighted, $newtname, $oldtname
     // Modify error reporting level to suppress deprecated/strict warning "Assigning the return value of new by reference".
     $bckLevel    = error_reporting();
     $removeLevel = E_DEPRECATED;
-    $modLevel = $bckLevel & (~$removeLevel);
+    $modLevel    = $bckLevel & (~$removeLevel);
     error_reporting($modLevel);
     
     // Create the diff class.

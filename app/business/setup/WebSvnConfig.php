@@ -740,9 +740,8 @@ class WebSvnConfig extends XsgaAbstractClass
         // First look in the "normal repositories".
         foreach ($this->_repositories as $index => $rep) {
             
-            if (strcmp($rep->getDisplayName(), $name) == 0) {
-                $repref =& $this->_repositories[$index];
-                return $repref;
+            if (strcmp($rep->getDisplayName(), $name) === 0) {
+                return $this->_repositories[$index];
             }//end if
             
         }//end foreach
@@ -762,12 +761,8 @@ class WebSvnConfig extends XsgaAbstractClass
             }//end foreach
             
         }//end if
-
-        // Hack to return a string by reference; value retrieved at setup.php.
-        $str   = 'Unable to find repository "'.escape($name).'".';
-        $error =& $str;
         
-        return $error;
+        return 'Unable to find repository "'.escape($name).'".';
         
     }//end findRepository()
     

@@ -37,6 +37,7 @@ namespace app\business\diff;
  * Used classes.
  */
 use xsgaphp\XsgaAbstractClass;
+use app\business\setup\WebSvnCons;
 
 /**
  * ListingHelper class.
@@ -118,7 +119,7 @@ class ListingHelper extends XsgaAbstractClass
      */
     public function addDeletedLine($text, $lineno)
     {
-        $this->_add($text, $lineno, 'diffdeleted', '&nbsp;', '-', 'diffempty');
+        $this->_add($text, $lineno, 'diffdeleted', WebSvnCons::ANDNBSP, '-', 'diffempty');
         
     }//end addDeletedLine()
     
@@ -135,7 +136,7 @@ class ListingHelper extends XsgaAbstractClass
      */
     public function addAddedLine($text, $lineno)
     {
-        $this->_add('&nbsp;', '-', 'diffempty', $text, $lineno, 'diffadded');
+        $this->_add(WebSvnCons::ANDNBSP, '-', 'diffempty', $text, $lineno, 'diffadded');
         
     }//end addAddedLine()
     
