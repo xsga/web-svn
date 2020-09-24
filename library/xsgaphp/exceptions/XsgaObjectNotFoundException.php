@@ -5,7 +5,7 @@
  * PHP Version 5
  * 
  * @package Xsga\Xsga-Php\Library\Exceptions
- * @author  xsga <xsegales@outlook.com>
+ * @author  xsga <parker@xsga.es>
  * @version 1.0.0
  */
 

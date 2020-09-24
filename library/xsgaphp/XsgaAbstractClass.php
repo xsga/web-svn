@@ -5,7 +5,7 @@
  * PHP version 7
  *
  * @package Xsga\Xsga-Php\Library\Mvc\Abstract
- * @author  xsga <xsegales@outlook.com>
+ * @author  xsga <parker@xsga.es>
  * @version 1.0.0
  */
  

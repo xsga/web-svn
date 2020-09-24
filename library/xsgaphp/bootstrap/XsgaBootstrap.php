@@ -5,7 +5,7 @@
  * PHP Version 7
  *
  * @package Xsga\Xsga-Php\Library\Bootstrap
- * @author  xsga <xsegales@outlook.com>
+ * @author  xsga <parker@xsga.es>
  * @version 1.0.0
  */
 
